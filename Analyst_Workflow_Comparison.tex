@@ -1,189 +1,385 @@
-\documentclass[10pt,a4paper]{article}
-
+\documentclass[a4paper,10pt]{extarticle}
 \usepackage[utf8]{inputenc}
 \usepackage[T1]{fontenc}
+\usepackage{tgheros}
+\renewcommand{\familydefault}{\sfdefault}
+
 \usepackage{geometry}
-\geometry{a4paper, margin=1.4cm, top=1.4cm, bottom=1.4cm}
-
-\usepackage{xcolor}
-\definecolor{sapblue}{HTML}{0070D2}
-\definecolor{sapdark}{HTML}{0B192C}
-\definecolor{succgreen}{HTML}{059669}
-\definecolor{alertred}{HTML}{DC2626}
-\definecolor{warnamber}{HTML}{D97706}
-\definecolor{softgray}{HTML}{F8FAFC}
-\definecolor{bordergray}{HTML}{CBD5E1}
-
-\usepackage{tikz}
-\usetikzlibrary{shapes.geometric, arrows.meta, positioning, fit, backgrounds, calc}
-
-\usepackage{booktabs}
-\usepackage{array}
-\usepackage{titlesec}
-\usepackage{enumitem}
-\usepackage{tcolorbox}
-\usepackage{hyperref}
-
-\hypersetup{
-    colorlinks=true,
-    linkcolor=sapblue,
-    urlcolor=sapblue,
-    pdftitle={Confronto Architetturale Workflow: Legacy vs SAP BTP},
-    pdfauthor={Antigravity for Antonio}
+\geometry{
+  a4paper,
+  top=1.0cm,
+  bottom=1.0cm,
+  left=1.1cm,
+  right=1.1cm,
+  headheight=19pt,
+  footskip=13pt
 }
 
-% Compact titles
-\titleformat{\section}
-  {\normalfont\large\bfseries\color{sapdark}}{\thesection}{0.8em}{}[\vspace{-4pt}\color{sapblue}\titlerule]
-\titleformat{\subsection}
-  {\normalfont\normalsize\bfseries\color{sapblue}}{\thesubsection}{0.8em}{}
+\usepackage{xcolor}
+\usepackage{tabularx}
+\usepackage{booktabs}
+\usepackage{colortbl}
+\usepackage{enumitem}
+\usepackage{fancyhdr}
+\usepackage{titlesec}
+\usepackage{microtype}
+\usepackage{eurosym}
+\usepackage{ragged2e}
+\usepackage[most]{tcolorbox}
 
-\titlespacing*{\section}{0pt}{8pt}{4pt}
-\titlespacing*{\subsection}{0pt}{6pt}{2pt}
-\setlist{itemsep=1.5pt, topsep=2pt, parsep=0pt}
+% --- COLOR PALETTE ---
+\definecolor{sapnavy}{RGB}{10, 25, 47}
+\definecolor{sapblue}{RGB}{0, 112, 242}
+\definecolor{sapdarkblue}{RGB}{0, 65, 140}
+\definecolor{sapaccent}{RGB}{236, 244, 254}
+
+\definecolor{legacyred}{RGB}{198, 40, 40}
+\definecolor{legacydarkred}{RGB}{150, 20, 20}
+\definecolor{legacybg}{RGB}{254, 242, 242}
+\definecolor{legacyborder}{RGB}{245, 183, 177}
+
+\definecolor{modernteal}{RGB}{0, 137, 123}
+\definecolor{moderndarkteal}{RGB}{0, 100, 90}
+\definecolor{modernbg}{RGB}{235, 248, 245}
+\definecolor{modernborder}{RGB}{163, 228, 215}
+
+\definecolor{cardbg}{RGB}{248, 250, 252}
+\definecolor{borderlight}{RGB}{222, 226, 230}
+\definecolor{textdark}{RGB}{30, 41, 59}
+\definecolor{textmuted}{RGB}{100, 116, 139}
+\definecolor{goldaccent}{RGB}{230, 126, 34}
+
+% --- PAGE STYLING ---
+\pagestyle{fancy}
+\fancyhf{}
+\renewcommand{\headrulewidth}{0.4pt}
+\renewcommand{\headrule}{\hbox to\headwidth{\color{borderlight}\leaders\hrule height \headrulewidth\hfill}}
+\renewcommand{\footrulewidth}{0.4pt}
+\renewcommand{\footrule}{\hbox to\headwidth{\color{borderlight}\leaders\hrule height \footrulewidth\hfill}}
+
+\lhead{\fontsize{7.5}{9}\selectfont\color{textmuted}\textbf{SAP TRANSFORMATION PLAYBOOK} \quad$\vert$\quad Dal Legacy Shadow IT a SAP BTP}
+\rhead{\fontsize{7.5}{9}\selectfont\color{sapblue}\textbf{ARCHITETTURA \& WORKFLOW OPERATIVO}}
+\lfoot{\fontsize{7.5}{9}\selectfont\color{textmuted}Executive Comparison Guide $\cdot$ Uso Professionale \& Consulenza}
+\rfoot{\fontsize{7.5}{9}\selectfont\color{sapnavy}\textbf{Pagina \thepage\ di 2}}
+
+% --- BASE BOX STYLES ---
+\tcbset{
+  cardbase/.style={
+    enhanced,
+    boxrule=0.5pt,
+    arc=3pt,
+    left=6pt, right=6pt, top=4pt, bottom=4pt,
+    boxsep=1pt
+  }
+}
+
+\newtcolorbox{bannerbox}{
+  enhanced,
+  colback=sapnavy,
+  colframe=sapnavy,
+  arc=3.5pt,
+  boxrule=0pt,
+  left=8pt, right=8pt, top=6pt, bottom=6pt
+}
+
+\newtcolorbox{introbox}{
+  enhanced,
+  colback=sapaccent,
+  colframe=sapblue,
+  boxrule=0.5pt,
+  arc=3pt,
+  left=7pt, right=7pt, top=4pt, bottom=4pt
+}
+
+\newtcolorbox{wfphasebox}[2]{
+  enhanced,
+  colback=white,
+  colframe=borderlight,
+  boxrule=0.6pt,
+  arc=3.5pt,
+  left=6pt, right=6pt, top=4pt, bottom=4pt,
+  boxsep=1pt,
+  title={%
+    \fontsize{8.5}{10}\selectfont\bfseries\color{sapnavy}#1%
+    \hfill%
+    \fontsize{7.5}{9}\selectfont\color{textmuted}\textit{#2}%
+  },
+  colbacktitle=cardbg,
+  coltitle=sapnavy,
+  titlerule=0pt
+}
+
+\newtcolorbox{pillarcard}[1]{
+  cardbase,
+  colback=white,
+  colframe=sapdarkblue,
+  leftrule=0.5pt,
+  colbacktitle=sapdarkblue,
+  title={\fontsize{8}{9.5}\selectfont\bfseries\color{white}#1},
+  left=6pt, right=6pt, top=4pt, bottom=4pt
+}
 
 \begin{document}
 
-% Header Box
-\begin{tcolorbox}[colback=sapblue!6!white, colframe=sapblue, title={\bfseries\large Confronto Architetturale dei Workflow: Legacy (SAP GUI) vs.\ SAP BTP}, fonttitle=\sffamily, top=4pt, bottom=4pt, left=8pt, right=8pt]
-\sffamily\footnotesize
-\textbf{Ambito Tecnico:} Evoluzione dal modello frammentato (SAP GUI + Excel + Email) alla piattaforma cloud enterprise integrata.\\
-\textbf{Caso di Studio:} Rilevamento anomalie di prezzo fornitori, validazione e blocco tempestivo degli ordini di acquisto.
-\end{tcolorbox}
+% ================= PAGE 1 =================
+
+% --- TOP HEADER BANNER ---
+\begin{bannerbox}
+  \begin{tabularx}{\textwidth}{@{} X r @{}}
+    {\fontsize{13}{15}\selectfont\bfseries\color{white}Workflow dell'Analyst: Da Excel a SAP BTP} &
+    \tcbox[on line, size=small, colback=sapblue, colframe=sapblue, arc=2.5pt, boxsep=1pt]{\fontsize{7}{8}\selectfont\bfseries\color{white}EXECUTIVE BRIEFING} \\
+    {\fontsize{8}{10}\selectfont\color{sapaccent}Superare lo Shadow IT: dal data wrangling manuale alla governance e all'analisi real-time con Clean Core} &
+    {\fontsize{7}{8}\selectfont\color{white}SAP Business Architecture}
+  \end{tabularx}
+\end{bannerbox}
+
+\vspace{-3pt}
+
+% --- INTRO CALLOUT ---
+\begin{introbox}
+  \fontsize{7.6}{9.5}\selectfont
+  \textbf{\color{sapdarkblue}Il Salto di Qualit\`a:} Nel modello tradizionale l'analista spende l'\textbf{80\% del tempo} a scaricare tabelle, sistemare join manuali e verificare formule \texttt{CERCA.VERT} su file Excel non tracciati (\textit{Shadow IT}). Con \textbf{SAP BTP}, i dati rimangono governati alla fonte secondo il paradigma \textbf{Clean Core}: l'analista opera su cruscotti live sicuri, eliminando i colli di bottiglia ed elevandosi a partner strategico per il business.
+\end{introbox}
+
+\vspace{-2pt}
+
+% ================= FASE 1 =================
+\begin{wfphasebox}{Fase 1 $\cdot$ Acquisizione \& Ingestione Dati}{Dall'estrazione manuale alla federazione live}
+  \begin{tcbraster}[raster columns=2, raster equal height, raster column skip=5pt]
+    \begin{tcolorbox}[cardbase, colback=legacybg, colframe=legacyred, leftrule=2.5pt]
+      \fontsize{7.3}{8.9}\selectfont
+      \textbf{\color{legacydarkred}LEGACY: Dump Manuale da SAP GUI}\hfill\color{textmuted}(SE16N, SQVI, AL11)\\
+      \textbf{Flusso:} Query tecniche su tabelle grezze (\texttt{BKPF}, \texttt{BSEG}, \texttt{MARA}) ed export locale in dump \texttt{.csv} o cartelle Excel.\\
+      \textbf{\color{legacydarkred}Vulnerabilit\`a \& Limiti:}
+      \begin{itemize}[leftmargin=8pt, itemsep=0pt, topsep=1pt]
+        \item Dati statici e desincronizzati gi\`a dopo pochi minuti dal salvataggio.
+        \item Elevato stress computazionale sul database di produzione ERP.
+        \item Rischio data-leak: dati finanziari riservati salvati su PC personali.
+      \end{itemize}
+    \end{tcolorbox}
+    \begin{tcolorbox}[cardbase, colback=modernbg, colframe=modernteal, leftrule=2.5pt]
+      \fontsize{7.3}{8.9}\selectfont
+      \textbf{\color{moderndarkteal}SAP BTP: Federazione Live}\hfill\color{textmuted}(Datasphere, Integration Suite)\\
+      \textbf{Flusso:} Connessione all'ERP mediante Core Data Services (CDS Views) esposte tramite API OData v4 certificate. Zero esportazioni manuali.\\
+      \textbf{\color{moderndarkteal}Vantaggi Clean Core:}
+      \begin{itemize}[leftmargin=8pt, itemsep=0pt, topsep=1pt]
+        \item Accesso federato in tempo reale: i dati vengono letti dove risiedono.
+        \item Carico transazionale nullo sul database ERP operativo.
+        \item Sicurezza enterprise con SAP Cloud Identity Services e SSO aziendale.
+      \end{itemize}
+    \end{tcolorbox}
+  \end{tcbraster}
+\end{wfphasebox}
 
 \vspace{-4pt}
 
-\section{Sintesi Comparativa dei Due Modelli}
-
-\begin{table}[h!]
-\centering
-\footnotesize
-\sffamily
-\renewcommand{\arraystretch}{1.2}
-\begin{tabular}{p{3.8cm} p{6.8cm} p{7.0cm}}
-\toprule
-\textbf{Parametro} & \textbf{Workflow Tradizionale (Legacy)} & \textbf{Workflow Moderno (SAP BTP)} \\
-\midrule
-\textbf{Interfaccia Utente} & SAP GUI client desktop anni '90, rigido e monolitico. & Web / Mobile responsive nativo (\textbf{SAP Fiori / Work Zone}). \\
-\textbf{Tempo Preparazione} & 1 -- 3 ore di copia-incolla ed export manuale. & \textbf{0 secondi} (dati federati live in streaming in memoria). \\
-\textbf{Analisi Anomalie} & Manuale con \texttt{CERCA.VERT} e Pivot su PC locale. & Assistita da AI e \textbf{Smart Assist} in \textbf{SAP Analytics Cloud}. \\
-\textbf{Canale di Notifica} & Email manuale con file Excel allegato non protetto. & Notifica Push istantanea (MS Teams / Smartphone del manager). \\
-\textbf{Esecuzione Azione} & Rientro manuale su SAP GUI (\texttt{ME22N}) per bloccare. & \textbf{Pulsante integrato} nella schermata Fiori $\rightarrow$ Event Mesh. \\
-\textbf{Integrità ERP} & Rischio di personalizzazioni invasive (\textit{oggetti Z}). & \textbf{Clean Core}: ERP intatto, microservizi esterni via API OData. \\
-\textbf{Sicurezza / GDPR} & Shadow IT: file riservati sparsi su desktop e mail. & Dati crittografati, token \textbf{OAuth 2.0 / IAS}, audit log completo. \\
-\bottomrule
-\end{tabular}
-\end{table}
-
-\vspace{-6pt}
-
-\section{Il Vecchio Workflow (SAP GUI + Fogli Excel + Email)}
-
-\begin{center}
-\begin{tikzpicture}[
-  node distance=0.48cm and 0.8cm,
-  boxStep/.style={
-    rectangle, rounded corners=3pt, minimum width=9.5cm, minimum height=0.62cm,
-    text width=9.2cm, align=left, fill=red!6, draw=alertred!60, font=\scriptsize\sffamily
-  },
-  boxAlert/.style={
-    rectangle, rounded corners=3pt, minimum width=9.5cm, minimum height=0.62cm,
-    text width=9.2cm, align=left, fill=warnamber!12, draw=warnamber!80, font=\scriptsize\bfseries\sffamily
-  },
-  boxCrit/.style={
-    rectangle, rounded corners=3pt, minimum width=9.5cm, minimum height=0.62cm,
-    text width=9.2cm, align=left, fill=alertred!16, draw=alertred!85, font=\scriptsize\bfseries\sffamily
-  },
-  arr/.style={-{Stealth[scale=0.9]}, thick, draw=alertred!75}
-]
-
-\node[boxStep] (step1) {\textbf{1. Apertura SAP GUI}: Accesso con credenziali locali ed esecuzione transazione (es. \texttt{ME2L} o \texttt{SE16N})};
-\node[boxStep, below=of step1] (step2) {\textbf{2. Export Massivo Dati}: Clic su \textit{Export to Spreadsheet} $\rightarrow$ Salva file locale \texttt{Ordini.xlsx} (150 MB)};
-\node[boxAlert, below=of step2] (step3) {\textbf{3. Elaborazione Shadow IT}: Download CSV da portali fornitori esterni; 45--90 min di formule \texttt{CERCA.VERT} e Pivot};
-\node[boxCrit, below=of step3] (step4) {\textbf{4. Rilevamento Tardivo}: Identificata anomalia (es. riga 4.312 con aumento prezzo del 20\% non autorizzato)};
-\node[boxStep, below=of step4] (step5) {\textbf{5. Invio Email Non Tracciata}: Composizione email al Procurement Manager con file pesante allegato};
-\node[boxAlert, below=of step5] (step6) {\textbf{6. Coda di Attesa Asincrona}: Attesa di ore o giorni prima che il responsabile legga e verifichi la segnalazione};
-\node[boxCrit, below=of step6] (step7) {\textbf{7. Blocco Manuale Tardivo}: Il Manager riapre SAP GUI (\texttt{ME22N}), cerca l'ordine a mano e imposta il blocco};
-
-\draw[arr] (step1) -- (step2);
-\draw[arr] (step2) -- (step3);
-\draw[arr] (step3) -- (step4);
-\draw[arr] (step4) -- (step5);
-\draw[arr] (step5) -- (step6);
-\draw[arr] (step6) -- (step7);
-
-\end{tikzpicture}
-\end{center}
-
-\newpage
-
-\section{Il Nuovo Workflow Moderno con SAP BTP}
-
-Nel paradigma cloud-native di BTP, l'elaborazione \`e continua, reattiva agli eventi e integrata senza duplicare dati.
-
-\vspace{0.2cm}
-
-\begin{center}
-\begin{tikzpicture}[
-  node distance=0.48cm and 0.8cm,
-  boxData/.style={
-    rectangle, rounded corners=3pt, minimum width=9.5cm, minimum height=0.62cm,
-    text width=9.2cm, align=left, fill=sapblue!7, draw=sapblue!70, font=\scriptsize\sffamily
-  },
-  boxApp/.style={
-    rectangle, rounded corners=3pt, minimum width=9.5cm, minimum height=0.62cm,
-    text width=9.2cm, align=left, fill=succgreen!8, draw=succgreen!80, font=\scriptsize\sffamily
-  },
-  boxAuto/.style={
-    rectangle, rounded corners=3pt, minimum width=9.5cm, minimum height=0.62cm,
-    text width=9.2cm, align=left, fill=purple!7, draw=purple!75, font=\scriptsize\sffamily
-  },
-  boxFinal/.style={
-    rectangle, rounded corners=3pt, minimum width=9.5cm, minimum height=0.62cm,
-    text width=9.2cm, align=left, fill=succgreen!20, draw=succgreen!90!black, font=\scriptsize\bfseries\sffamily
-  },
-  arrBTP/.style={-{Stealth[scale=0.9]}, thick, draw=sapblue!75},
-  arrApp/.style={-{Stealth[scale=0.9]}, thick, draw=succgreen!75},
-  arrAuto/.style={-{Stealth[scale=0.9]}, thick, draw=purple!75}
-]
-
-\node[boxData] (b1) {\textbf{1. Connessione API Sicura}: SAP Integration Suite connette in tempo reale S/4HANA, portali e banche terze};
-\node[boxData, below=of b1] (b2) {\textbf{2. Federazione Dati Live}: SAP HANA Cloud \& Datasphere interrogano i dati \textit{in-memory} (zero export Excel)};
-\node[boxApp, below=of b2] (b3) {\textbf{3. Analisi Aumentata (SAC)}: Algoritmi di Machine Learning rilevano ed evidenziano le anomalie con badge rosso};
-\node[boxApp, below=of b3] (b4) {\textbf{4. Actionable Insight}: L'analista apre la schermata Fiori e clicca direttamente su \textit{[Richiedi Blocco Ordine]}};
-\node[boxAuto, below=of b4] (b5) {\textbf{5. Event-Driven Messaging}: SAP Event Mesh cattura l'evento e attiva SAP Build Process Automation};
-\node[boxAuto, below=of b5] (b6) {\textbf{6. Notifica Push Istantanea}: Il Manager riceve l'alert su smartphone / MS Teams e tocca \textit{[Approva]}};
-\node[boxFinal, below=of b6] (b7) {\textbf{7. Aggiornamento Automatico ERP}: S/4HANA riceve il blocco via API OData certificate (\textit{Clean Core})};
-
-\draw[arrBTP] (b1) -- (b2);
-\draw[arrBTP] (b2) -- (b3);
-\draw[arrApp] (b3) -- (b4);
-\draw[arrApp] (b4) -- (b5);
-\draw[arrAuto] (b5) -- (b6);
-\draw[arrAuto] (b6) -- (b7);
-
-\end{tikzpicture}
-\end{center}
+% ================= FASE 2 =================
+\begin{wfphasebox}{Fase 2 $\cdot$ Elaborazione \& Logica di Business}{Dalle macro fragili al motore In-Memory}
+  \begin{tcbraster}[raster columns=2, raster equal height, raster column skip=5pt]
+    \begin{tcolorbox}[cardbase, colback=legacybg, colframe=legacyred, leftrule=2.5pt]
+      \fontsize{7.3}{8.9}\selectfont
+      \textbf{\color{legacydarkred}LEGACY: Formule \& Macro su Excel}\hfill\color{textmuted}(File locali, Script VBA)\\
+      \textbf{Flusso:} Pulizia record, join con \texttt{CERCA.VERT} o \texttt{XLOOKUP}, pivot complesse e script VBA manutenuti dal singolo operatore.\\
+      \textbf{\color{legacydarkred}Vulnerabilit\`a \& Limiti:}
+      \begin{itemize}[leftmargin=8pt, itemsep=0pt, topsep=1pt]
+        \item Fragilit\`a: eliminare o spostare una colonna rompe le formule a catena.
+        \item Limite di 1.048.576 righe con blocchi e crash frequenti di sistema.
+        \item Logica ``Black Box'': formule opache che dipendono dal singolo analista.
+      \end{itemize}
+    \end{tcolorbox}
+    \begin{tcolorbox}[cardbase, colback=modernbg, colframe=modernteal, leftrule=2.5pt]
+      \fontsize{7.3}{8.9}\selectfont
+      \textbf{\color{moderndarkteal}SAP BTP: In-Memory \& Semantic Layer}\hfill\color{textmuted}(HANA Cloud, Business Layer)\\
+      \textbf{Flusso:} La logica di business, le gerarchie e i KPI sono codificati nel layer semantico centrale ed elaborati in-memory direttamente nel cloud.\\
+      \textbf{\color{moderndarkteal}Vantaggi Clean Core:}
+      \begin{itemize}[leftmargin=8pt, itemsep=0pt, topsep=1pt]
+        \item Calcoli istantanei (millisecondi) su decine di milioni di record.
+        \item Single Source of Truth: una sola definizione certificata per ogni KPI.
+        \item Predisposizione nativa per algoritmi predittivi (BTP AI Foundation).
+      \end{itemize}
+    \end{tcolorbox}
+  \end{tcbraster}
+\end{wfphasebox}
 
 \vspace{-4pt}
 
-\section{I 3 Pilastri Architetturali Fondamentali}
+% ================= FASE 3 =================
+\begin{wfphasebox}{Fase 3 $\cdot$ Distribuzione \& Reporting}{Dall'allegato email al portale analitico unificato}
+  \begin{tcbraster}[raster columns=2, raster equal height, raster column skip=5pt]
+    \begin{tcolorbox}[cardbase, colback=legacybg, colframe=legacyred, leftrule=2.5pt]
+      \fontsize{7.3}{8.9}\selectfont
+      \textbf{\color{legacydarkred}LEGACY: Allegati Email \& File Share}\hfill\color{textmuted}(Outlook, Share di rete)\\
+      \textbf{Flusso:} Spedizione manuale di allegati (\texttt{Report\_Q3\_DEF\_v2.xlsx}) a dirigenti, capi reparto e controller aziendali.\\
+      \textbf{\color{legacydarkred}Vulnerabilit\`a \& Limiti:}
+      \begin{itemize}[leftmargin=8pt, itemsep=0pt, topsep=1pt]
+        \item Moltiplicazione di versioni: ogni destinatario modifica la propria copia.
+        \item Mancanza di audit log: impossibile sapere chi legge o modifica i file.
+        \item Severa non-conformit\`a a GDPR e standard ISO 27001 sulla privacy.
+      \end{itemize}
+    \end{tcolorbox}
+    \begin{tcolorbox}[cardbase, colback=modernbg, colframe=modernteal, leftrule=2.5pt]
+      \fontsize{7.3}{8.9}\selectfont
+      \textbf{\color{moderndarkteal}SAP BTP: SAP Analytics Cloud}\hfill\color{textmuted}(SAC Stories, Build Work Zone)\\
+      \textbf{Flusso:} Cruscotti interattivi responsive fruibili via web browser o tablet aziendale, con filtri dinamici e navigazione drill-down.\\
+      \textbf{\color{moderndarkteal}Vantaggi Clean Core:}
+      \begin{itemize}[leftmargin=8pt, itemsep=0pt, topsep=1pt]
+        \item Tutti i manager consultano l'unica versione aggiornata in tempo reale.
+        \item Permessi granulari basati sui ruoli aziendali (RBAC e Row-Level Security).
+        \item Tracciamento accessi certificato e sicurezza enterprise integrata.
+      \end{itemize}
+    \end{tcolorbox}
+  \end{tcbraster}
+\end{wfphasebox}
 
-\begin{enumerate}[leftmargin=*]
-    \item \textbf{Data Virtualization (Zero Copie)}: Con SAP HANA Cloud e Datasphere i dati non vengono duplicati o scaricati su supporti locali. Rimangono custoditi nel database centrale e vengono interrogati in tempo reale alla velocit\`a della RAM.
-    \item \textbf{Actionable Insights (Dall'Analisi all'Azione)}: L'applicazione analitica cessa di essere un cruscotto passivo. L'interfaccia Fiori incorpora i pulsanti operativi per scatenare i processi transazionali all'istante.
-    \item \textbf{Strategia Clean Core (Disaccoppiamento)}: Nessun programma personalizzato viene iniettato nel core dell'ERP S/4HANA. L'intera logica risiede su BTP e comunica via API standard, azzerando i costi di aggiornamento di versione.
-\end{enumerate}
+\vspace{-4pt}
 
-\vspace{0.1cm}
+% ================= FASE 4 =================
+\begin{wfphasebox}{Fase 4 $\cdot$ Decision Making \& Azione}{Dalle conciliazioni retroattive al Closed-Loop}
+  \begin{tcbraster}[raster columns=2, raster equal height, raster column skip=5pt]
+    \begin{tcolorbox}[cardbase, colback=legacybg, colframe=legacyred, leftrule=2.5pt]
+      \fontsize{7.3}{8.9}\selectfont
+      \textbf{\color{legacydarkred}LEGACY: Dispute sui Dati \& Input Manuale}\hfill\color{textmuted}(Meeting, Rettifiche a mano)\\
+      \textbf{Flusso:} Riunioni dedicate a capire ``qual \`e il numero corretto''; rettifiche e aggiustamenti vengono reinseriti a mano nell'ERP.\\
+      \textbf{\color{legacydarkred}Vulnerabilit\`a \& Limiti:}
+      \begin{itemize}[leftmargin=8pt, itemsep=0pt, topsep=1pt]
+        \item Decisioni reattive basate su informazioni vecchie di 3--7 giorni.
+        \item Ore lavorative sprecate ogni mese in conciliazioni e spiegazioni.
+        \item Elevato tasso di errore umano durante la re-imputazione dei dati.
+      \end{itemize}
+    \end{tcolorbox}
+    \begin{tcolorbox}[cardbase, colback=modernbg, colframe=modernteal, leftrule=2.5pt]
+      \fontsize{7.3}{8.9}\selectfont
+      \textbf{\color{moderndarkteal}SAP BTP: Closed-Loop Analytics}\hfill\color{textmuted}(SAC Planning, Build Automation)\\
+      \textbf{Flusso:} Simulazioni What-If e attivazione di processi operativi (sblocco ordini, rettifiche budget) direttamente dai grafici interattivi.\\
+      \textbf{\color{moderndarkteal}Vantaggi Clean Core:}
+      \begin{itemize}[leftmargin=8pt, itemsep=0pt, topsep=1pt]
+        \item Reattivit\`a immediata ai trend operativi grazie a dati sub-second.
+        \item Closed-Loop: l'azione analitica aggiorna automaticamente l'ERP.
+        \item Totale eliminazione degli incontri dedicati alla verifica dei numeri.
+      \end{itemize}
+    \end{tcolorbox}
+  \end{tcbraster}
+\end{wfphasebox}
 
-\begin{tcolorbox}[colback=softgray, colframe=bordergray, title={\sffamily\scriptsize\bfseries Cheat Sheet per Colloqui di Lavoro e Riunioni Tecniche}, top=3pt, bottom=3pt, left=6pt, right=6pt]
-\sffamily\scriptsize
-\begin{itemize}[leftmargin=10pt]
-    \item \textbf{Perch\'e BTP genera ROI?} Elimina centinaia di ore/uomo perse in compiti manuali e blocca le perdite prima che le fatture vengano saldate.
-    \item \textbf{Come garantisce la sicurezza?} Sostituisce la \textit{Shadow IT} con autenticazione federata OAuth 2.0 / OIDC gestita da SAP Cloud Identity Services.
-    \item \textbf{Cos'\`e il Clean Core?} \`E la disciplina architetturale che preserva lo standard S/4HANA, delegando tutte le estensioni a microservizi \textit{side-by-side} su BTP.
-\end{itemize}
+\clearpage
+% ================= PAGE 2 =================
+
+{\fontsize{10}{12}\selectfont\bfseries\color{sapnavy}Matrice Esecutiva: Confronto Prestazionale \& Governance}
+\vspace{2pt}
+
+{\fontsize{7.4}{9.3}\selectfont
+\noindent\renewcommand{\arraystretch}{1.25}%
+\begin{tabularx}{\textwidth}{@{} >{\bfseries\RaggedRight\color{sapnavy}}p{2.6cm} >{\RaggedRight}X >{\RaggedRight}X >{\bfseries\RaggedRight}p{2.8cm} @{}}
+  \toprule
+  \rowcolor{sapnavy}
+  \color{white}Dimensione & \color{white}Flusso Legacy (Excel + SAP GUI) & \color{white}Flusso BTP (Clean Core) & \color{white}Impatto di Business \\
+  \midrule
+  \rowcolor{cardbg}
+  Latenza del Dato & Differita (3--5 giorni per estrarre, unire e pulire) & Sub-second (Live Data Federation su SAP HANA) & \color{modernteal}Decisioni in tempo reale \\
+  Integrit\`a \& Qualit\`a & Critica: l'88\% dei fogli Excel aziendali contiene formule errate & Certificata alla sorgente nel Semantic Layer centrale & \color{modernteal}Zero dispute sui numeri \\
+  \rowcolor{cardbg}
+  Sicurezza \& GDPR & Rischio alto: file su PC locali e allegati non cifrati via mail & Massima: crittografia TLS/AES, SSO, RBAC a livello di riga & \color{modernteal}100\% conforme normative \\
+  Volume \& Scalabilit\`a & Si blocca oltre 1 milione di righe con macro pesanti & Motore In-Memory Cloud scalabile su centinaia di milioni di record & \color{modernteal}Big Data ready \\
+  \rowcolor{cardbg}
+  Sforzo Ricorrente & Elevato: ogni chiusura mese richiede giornate di lavoro manuale & Minimo: la pipeline si aggiorna automaticamente in tempo reale & \color{modernteal}+80\% tempo per analisi \\
+  Impatto Upgrade ERP & Macro e dump si rompono a ogni aggiornamento di sistema & Clean Core: le API e i CDS rimangono stabili e compatibili & \color{modernteal}Costi di migrazione ridotti \\
+  \bottomrule
+\end{tabularx}\par
+}
+
+\vspace{10pt}
+
+{\fontsize{10.5}{13}\selectfont\bfseries\color{sapnavy}Analisi Economica: Il Vero Costo di Excel vs Investimento BTP}
+\vspace{3pt}
+
+\begin{tcbraster}[raster columns=3, raster equal height, raster column skip=6pt]
+  \begin{tcolorbox}[
+    cardbase,
+    colback=legacybg,
+    colframe=legacyred,
+    colbacktitle=legacyred,
+    title={\fontsize{8}{9.5}\selectfont\bfseries\color{white}1. L'Illusione del Costo Zero}
+  ]
+    \fontsize{7.3}{9}\selectfont
+    \textbf{La falsa percezione:} Excel appare gratuito poich\'e compreso nella licenza Office.\\
+    \textbf{I costi sommersi reali:}
+    \begin{itemize}[leftmargin=7pt, itemsep=1.5pt, topsep=1.5pt]
+      \item \textbf{15--20 ore/settimana} per analista spese in mera pulizia dati.
+      \item Costo occulto stimato: oltre \textbf{18.000\,\euro{}/anno} per risorsa.
+      \item Decisioni su dati sfasati con impatto di milioni su scorte e pricing.
+    \end{itemize}
+  \end{tcolorbox}
+  \begin{tcolorbox}[
+    cardbase,
+    colback=sapaccent,
+    colframe=sapblue,
+    colbacktitle=sapblue,
+    title={\fontsize{8}{9.5}\selectfont\bfseries\color{white}2. L'Investimento BTP}
+  ]
+    \fontsize{7.3}{9}\selectfont
+    \textbf{Modello trasparente a consumo:}
+    \begin{itemize}[leftmargin=7pt, itemsep=1.5pt, topsep=1.5pt]
+      \item Modello flessibile (\textbf{CPEA} o Pay-As-You-Go).
+      \item Si paga unicamente per i servizi attivi (Storage, SAC, Compute).
+      \item Zero spese server on-premise: backup e sicurezza inclusi.
+      \item Drastica contrazione del debito tecnico e del codice ABAP custom.
+    \end{itemize}
+  \end{tcolorbox}
+  \begin{tcolorbox}[
+    cardbase,
+    colback=modernbg,
+    colframe=modernteal,
+    colbacktitle=modernteal,
+    title={\fontsize{8}{9.5}\selectfont\bfseries\color{white}3. Il Ritorno sull'Investimento}
+  ]
+    \fontsize{7.3}{9}\selectfont
+    \textbf{Ritorno misurabile (ROI):}
+    \begin{itemize}[leftmargin=7pt, itemsep=1.5pt, topsep=1.5pt]
+      \item \textbf{Break-even in 4--6 mesi} per recupero di ore lavorative.
+      \item Chiusura contabile velocizzata del \textbf{90\%} (\textit{Fast Close}).
+      \item Azzeramento rischi sanzioni GDPR (fino al 4\% del fatturato).
+      \item Allineamento immediato delle scelte commerciali alla strategia.
+    \end{itemize}
+  \end{tcolorbox}
+\end{tcbraster}
+
+\vspace{10pt}
+
+{\fontsize{10.5}{13}\selectfont\bfseries\color{sapnavy}I 4 Pilastri Architetturali del Clean Core su BTP}
+\vspace{3pt}
+
+\begin{tcbraster}[raster columns=2, raster equal height, raster column skip=6pt, raster row skip=5pt]
+  \begin{pillarcard}{1. Strategia Clean Core (ERP Standard Intatto)}
+    \fontsize{7.3}{9.1}\selectfont
+    Nessuna modifica custom o script invasivo nel database transazionale dell'ERP. Tutte le estensioni analitiche e logiche di business risiedono su SAP BTP, consentendo aggiornamenti a SAP S/4HANA fluidi e privi di regressioni.
+  \end{pillarcard}
+  \begin{pillarcard}{2. Single Source of Truth (Verit\`a del Dato Unica)}
+    \fontsize{7.3}{9.1}\selectfont
+    I dati aziendali risiedono unicamente nell'infrastruttura governata. I modelli semantici di SAP Datasphere e SAC assicurano che tutta la direzione e i reparti leggano gli stessi identici numeri certificati.
+  \end{pillarcard}
+  \begin{pillarcard}{3. Data Federation First (Zero Repliche Superflue)}
+    \fontsize{7.3}{9.1}\selectfont
+    Superamento dei lenti job ETL. BTP adotta una federazione intelligente che interroga i dati remoti (SAP, Salesforce, datalake cloud) direttamente alla sorgente nel momento del bisogno, eliminando costi di duplicazione.
+  \end{pillarcard}
+  \begin{pillarcard}{4. Governance \& Sicurezza Centralizzata}
+    \fontsize{7.3}{9.1}\selectfont
+    Controllo univoco degli accessi via SAP Cloud Identity Services. Applicazione automatica di data masking, policy di riservatezza e audit trail completi su ogni singola query, in piena aderenza agli standard ISO e GDPR.
+  \end{pillarcard}
+\end{tcbraster}
+
+\vspace{10pt}
+
+% --- CLOSING EXECUTIVE TAKEAWAY ---
+\begin{tcolorbox}[
+  enhanced,
+  colback=sapnavy,
+  colframe=goldaccent,
+  boxrule=0.8pt,
+  arc=3.5pt,
+  left=10pt, right=10pt, top=6pt, bottom=6pt
+]
+  \fontsize{7.8}{10}\selectfont\color{white}
+  \textbf{\color{goldaccent}Sintesi di Ruolo per il Business Analyst:} La transizione verso SAP BTP non \`e semplicemente un cambio di software: \`e una crescita strategica di carriera. Smettere di operare come ``data cleaner manuale'' su fogli Excel isolati consente di posizionarsi come \textbf{Business Technology Partner}, progettando architetture decisionali automatizzate, sicure e ad altissimo impatto per il business.
 \end{tcolorbox}
 
 \end{document}
