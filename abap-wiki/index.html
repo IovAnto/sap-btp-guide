@@ -3,90 +3,60 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>ABAP Data Dictionary Wiki</title>
+  <title>ABAP Data Dictionary — Manuale Tecnico</title>
   <link rel="stylesheet" href="css/style.css">
   <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220%200%20100%20100%22><rect width=%22100%22 height=%22100%22 rx=%2220%22 fill=%22%23212529%22/><text y=%2265%22 x=%2214%22 font-size=%2250%22 fill=%22white%22 font-family=%22monospace%22>SAP</text></svg>">
 </head>
 <body>
 
-  <!-- Top Header Navigation -->
-  <header class="header">
-    <div class="header-brand">
-      <div class="header-title">
-        <span>ABAP DDIC Wiki</span>
-        <span class="badge-tag" id="table-count-badge">16 Tabelle</span>
-      </div>
-    </div>
-
-    <!-- Search input -->
-    <div class="search-container">
-      <input type="text" id="global-search" class="search-input" placeholder="Cerca tabella, campo (es. FKDAT, FKART), elemento dati..." autocomplete="off" spellcheck="false">
-      <span class="search-shortcut">/</span>
-    </div>
-
-    <!-- Controls -->
-    <div class="header-actions">
-      <button id="btn-import-modal" class="btn" title="Importa o Aggiungi Tabelle in formato JSON">
-        <span>Import JSON</span>
-      </button>
-      <button id="theme-toggle" class="btn" title="Cambia tema Dark / Light">
-        <span id="theme-icon" style="font-family: var(--font-mono); font-size: 11px;">●</span>
-        <span id="theme-label">Dark</span>
-      </button>
-    </div>
-  </header>
-
-  <!-- Main Application Container -->
-  <div class="app-container">
+  <div class="layout">
     
-    <!-- Sidebar: Hierarchical Tree Explorer -->
+    <!-- Sidebar: Table of Contents (TOC Tree) -->
     <aside class="sidebar">
       <div class="sidebar-header">
-        <span>Esploratore ad Albero</span>
-        <div class="sidebar-actions">
-          <button id="btn-collapse-all" class="btn-icon-sm" title="Comprimi tutto">◀</button>
-          <button id="btn-expand-all" class="btn-icon-sm" title="Espandi tutto">▼</button>
-        </div>
+        <h1>ABAP Data Dictionary</h1>
+        <p>Manuale Tecnico & Modello Dati</p>
       </div>
-      <div class="tree-container" id="tree-container">
+
+      <div class="sidebar-search">
+        <input type="text" id="search-input" placeholder="Cerca tabella o campo (es. FKDAT, F2)..." autocomplete="off" spellcheck="false">
+        <span class="search-shortcut-hint">/</span>
+      </div>
+
+      <nav class="sidebar-nav" id="toc-nav">
         <!-- Rendered dynamically via JavaScript -->
+      </nav>
+
+      <div class="sidebar-footer">
+        <span id="footer-count">16 Tabelle DDIC</span>
+        <button class="btn-toggle-theme" id="theme-btn">Tema: Dark</button>
       </div>
     </aside>
 
-    <!-- Main Content Area -->
-    <main class="main-content" id="main-content">
-      <div class="empty-state" id="empty-state">
-        <div class="empty-state-icon" style="font-family: var(--font-mono); font-size: 16px; font-weight: 700; color: var(--accent); margin-bottom: 8px;">[DDIC]</div>
-        <h3>Seleziona una tabella dall'albero o usa la ricerca</h3>
-        <p style="margin-top: 6px; font-size: 13px;">Premi <kbd style="font-family: var(--font-mono); background: var(--bg-tertiary); padding: 2px 6px; border-radius: 4px; border: 1px solid var(--border-color);">/</kbd> per cercare istantaneamente qualsiasi campo o tabella standard.</p>
-      </div>
-      <div id="table-detail-container" style="display: none;">
-        <!-- Rendered dynamically -->
-      </div>
+    <!-- Reading Scroll Area: Complete Continuous Technical Manual -->
+    <main class="reading-scroll" id="reading-scroll">
+      <article class="manual-container" id="manual-container">
+        <!-- Dynamically rendered Table Manual Chapter -->
+      </article>
     </main>
 
   </div>
 
-  <!-- Modal for JSON Import -->
-  <div class="modal-backdrop" id="modal-import">
-    <div class="modal-box">
-      <div class="modal-header">
-        <h3 class="modal-title">Importa Definizione Tabella (JSON)</h3>
-        <button id="btn-close-modal" class="btn-icon-sm" style="font-size: 16px;">✕</button>
+  <!-- Inspector Modal (Data Element, Domain & Where-Used Cross Reference) -->
+  <div class="inspector-overlay hidden" id="inspector-modal" role="dialog" aria-modal="true" aria-labelledby="modal-title">
+    <div class="inspector-card">
+      <div class="inspector-header">
+        <div class="inspector-badge" id="modal-badge">[DATA ELEMENT]</div>
+        <h2 class="inspector-title" id="modal-title">NOME_ELEMENTO</h2>
+        <button class="btn-modal-close" id="modal-close-btn" title="Chiudi (Esc)">✕</button>
       </div>
-      <p style="font-size: 12px; color: var(--text-muted); margin-bottom: 10px;">
-        Incolla la definizione di una tabella o un array di tabelle nel formato standard della Wiki. I dati saranno salvati localmente.
-      </p>
-      <textarea id="import-json-text" class="modal-textarea" placeholder='{ "tableName": "ZTABELLA", "module": "CUSTOM", ... }'></textarea>
-      <div class="modal-footer">
-        <button id="btn-export-json" class="btn">Esporta Tutto JSON</button>
-        <button id="btn-cancel-modal" class="btn">Annulla</button>
-        <button id="btn-confirm-import" class="btn btn-primary">Carica Dati</button>
+      <div class="inspector-body" id="modal-body">
+        <!-- Injected via JavaScript -->
       </div>
     </div>
   </div>
 
-  <!-- Scripts: Pre-bundled JS data fallback + app controller -->
+  <!-- Offline-safe dataset + manual controller script -->
   <script src="data/tables.js"></script>
   <script src="js/app.js"></script>
 </body>
