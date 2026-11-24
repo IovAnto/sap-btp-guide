@@ -1,4 +1,4 @@
-// ABAP Data Dictionary Core Dataset
+// ABAP Data Dictionary Core Dataset (Rich Examples)
 window.ABAP_DICTIONARY = {
   "metadata": {
     "title": "ABAP Data Dictionary Reference",
@@ -75,7 +75,22 @@ window.ABAP_DICTIONARY = {
               "decimals": 0,
               "shortText": "Identificativo mandante"
             }
-          }
+          },
+          "examples": [
+            {
+              "code": "100",
+              "desc": "Mandante di sviluppo"
+            },
+            {
+              "code": "200",
+              "desc": "Mandante di test / qualità"
+            },
+            {
+              "code": "500",
+              "desc": "Mandante di produzione"
+            }
+          ],
+          "businessMeaning": "Isola i dati aziendali all'interno della stessa istanza del database SAP."
         },
         {
           "position": 2,
@@ -111,7 +126,38 @@ window.ABAP_DICTIONARY = {
               "decimals": 0,
               "shortText": "Tipo fattura"
             }
-          }
+          },
+          "examples": [
+            {
+              "code": "F2",
+              "desc": "Fattura standard di vendita (creata dopo consegna merce o prestazione)"
+            },
+            {
+              "code": "F1",
+              "desc": "Fattura d'ordine (senza bolla di consegna)"
+            },
+            {
+              "code": "G2",
+              "desc": "Nota di accredito (Credit Memo) emessa per reso o sconto post-vendita"
+            },
+            {
+              "code": "L2",
+              "desc": "Nota di addebito (Debit Memo) per addebito spese o conguaglio"
+            },
+            {
+              "code": "RE",
+              "desc": "Fattura resi merce da cliente"
+            },
+            {
+              "code": "S1",
+              "desc": "Storno fattura (inverte contabilmente una fattura errata)"
+            },
+            {
+              "code": "IV",
+              "desc": "Fatturazione interna infragruppo (Intercompany Billing)"
+            }
+          ],
+          "businessMeaning": "Determina la procedura di fatturazione, il conto contabile e la tipologia di documento IVA generato."
         },
         {
           "position": 4,
@@ -129,7 +175,30 @@ window.ABAP_DICTIONARY = {
               "decimals": 0,
               "shortText": "Tipo documento SD"
             }
-          }
+          },
+          "examples": [
+            {
+              "code": "M",
+              "desc": "Fattura standard (Invoice)"
+            },
+            {
+              "code": "P",
+              "desc": "Nota di addebito (Debit Memo)"
+            },
+            {
+              "code": "O",
+              "desc": "Fattura pro-forma"
+            },
+            {
+              "code": "N",
+              "desc": "Storno fattura"
+            },
+            {
+              "code": "5",
+              "desc": "Fattura intercompany infragruppo"
+            }
+          ],
+          "businessMeaning": "Identifica la natura logica e la classificazione del documento all'interno del modulo SD."
         },
         {
           "position": 5,
@@ -165,7 +234,18 @@ window.ABAP_DICTIONARY = {
               "decimals": 0,
               "shortText": "Organizzazione commerciale"
             }
-          }
+          },
+          "examples": [
+            {
+              "code": "1000",
+              "desc": "Organizzazione commerciale Italia Sede Centrale"
+            },
+            {
+              "code": "2000",
+              "desc": "Organizzazione commerciale Export / Estero"
+            }
+          ],
+          "businessMeaning": "Ente giuridico responsabile della negoziazione e della vendita al cliente."
         },
         {
           "position": 7,
@@ -183,7 +263,22 @@ window.ABAP_DICTIONARY = {
               "decimals": 0,
               "shortText": "Canale distributivo"
             }
-          }
+          },
+          "examples": [
+            {
+              "code": "10",
+              "desc": "Vendita all'ingrosso (Wholesale)"
+            },
+            {
+              "code": "20",
+              "desc": "Vendita al dettaglio (Retail)"
+            },
+            {
+              "code": "30",
+              "desc": "Canale E-commerce / Web Shop"
+            }
+          ],
+          "businessMeaning": "Canale commerciale attraverso cui la merce o il servizio raggiunge il cliente."
         },
         {
           "position": 8,
@@ -201,7 +296,14 @@ window.ABAP_DICTIONARY = {
               "decimals": 0,
               "shortText": "Data formato AAAAMMGG"
             }
-          }
+          },
+          "examples": [
+            {
+              "code": "20261124",
+              "desc": "Data di emissione fattura memorizzata in formato DB YYYYMMDD (a video: 24.11.2026)"
+            }
+          ],
+          "businessMeaning": "Data contabile e fiscale usata per il calcolo dell'IVA e per la scadenza dei pagamenti."
         },
         {
           "position": 9,
@@ -255,7 +357,14 @@ window.ABAP_DICTIONARY = {
               "decimals": 0,
               "shortText": "Numero cliente"
             }
-          }
+          },
+          "examples": [
+            {
+              "code": "0001000245",
+              "desc": "Spesso coincide col committente, ma può essere la casa madre per una filiale"
+            }
+          ],
+          "businessMeaning": "Pagatore (Payer): il soggetto giuridico a cui è intestata la fattura e che effettua il bonifico."
         },
         {
           "position": 12,
@@ -273,7 +382,14 @@ window.ABAP_DICTIONARY = {
               "decimals": 0,
               "shortText": "Numero cliente"
             }
-          }
+          },
+          "examples": [
+            {
+              "code": "0001000245",
+              "desc": "Codice anagrafico a 10 cifre del cliente che ha emesso l'ordine"
+            }
+          ],
+          "businessMeaning": "Committente (Sold-to party): l'entità che ha firmato il contratto o l'ordine d'acquisto."
         },
         {
           "position": 13,
@@ -309,7 +425,22 @@ window.ABAP_DICTIONARY = {
               "decimals": 0,
               "shortText": "Stato trasferimento FI"
             }
-          }
+          },
+          "examples": [
+            {
+              "code": "C",
+              "desc": "Registrazione contabile eseguita con successo in FI (documento creato)"
+            },
+            {
+              "code": "A",
+              "desc": "Fattura bloccata per il trasferimento in contabilità (necessario rilascio in VF02)"
+            },
+            {
+              "code": "B",
+              "desc": "Errore durante la determinazione dei conti contabili (manca configurazione in VKOA)"
+            }
+          ],
+          "businessMeaning": "Mostra se la fattura ha già creato la registrazione contabile di ricavo nel modulo FI."
         }
       ]
     },
@@ -360,7 +491,22 @@ window.ABAP_DICTIONARY = {
               "decimals": 0,
               "shortText": "Mandante"
             }
-          }
+          },
+          "examples": [
+            {
+              "code": "100",
+              "desc": "Mandante di sviluppo"
+            },
+            {
+              "code": "200",
+              "desc": "Mandante di test / qualità"
+            },
+            {
+              "code": "500",
+              "desc": "Mandante di produzione"
+            }
+          ],
+          "businessMeaning": "Isola i dati aziendali all'interno della stessa istanza del database SAP."
         },
         {
           "position": 2,
@@ -504,7 +650,18 @@ window.ABAP_DICTIONARY = {
               "decimals": 0,
               "shortText": "Divisione"
             }
-          }
+          },
+          "examples": [
+            {
+              "code": "1000",
+              "desc": "Stabilimento Milano / Sede centrale"
+            },
+            {
+              "code": "1010",
+              "desc": "Stabilimento Produzione Torino"
+            }
+          ],
+          "businessMeaning": "Unità organizzativa deputata alla produzione, immagazzinamento o spedizione merci."
         },
         {
           "position": 10,
@@ -590,7 +747,22 @@ window.ABAP_DICTIONARY = {
               "decimals": 0,
               "shortText": "Mandante"
             }
-          }
+          },
+          "examples": [
+            {
+              "code": "100",
+              "desc": "Mandante di sviluppo"
+            },
+            {
+              "code": "200",
+              "desc": "Mandante di test / qualità"
+            },
+            {
+              "code": "500",
+              "desc": "Mandante di produzione"
+            }
+          ],
+          "businessMeaning": "Isola i dati aziendali all'interno della stessa istanza del database SAP."
         },
         {
           "position": 2,
@@ -680,7 +852,38 @@ window.ABAP_DICTIONARY = {
               "decimals": 0,
               "shortText": "Tipo ordine"
             }
-          }
+          },
+          "examples": [
+            {
+              "code": "OR",
+              "desc": "Ordine standard di vendita (Standard Sales Order)"
+            },
+            {
+              "code": "QT",
+              "desc": "Preventivo commerciale / Offerta formale (Quotation)"
+            },
+            {
+              "code": "IN",
+              "desc": "Richiesta di offerta conoscitiva cliente (Inquiry)"
+            },
+            {
+              "code": "FD",
+              "desc": "Consegna gratuita di campionatura (Free of charge)"
+            },
+            {
+              "code": "KB",
+              "desc": "Carico merce in conto deposito cliente (Consignment Fill-up)"
+            },
+            {
+              "code": "KE",
+              "desc": "Prelievo merce da conto deposito cliente (Consignment Issue)"
+            },
+            {
+              "code": "CR",
+              "desc": "Richiesta di nota di accredito per reclamo"
+            }
+          ],
+          "businessMeaning": "Governa l'intero flusso documentale (se richiede spedizione merce, fattura, blocchi di credito)."
         },
         {
           "position": 7,
@@ -839,7 +1042,22 @@ window.ABAP_DICTIONARY = {
               "decimals": 0,
               "shortText": "Mandante"
             }
-          }
+          },
+          "examples": [
+            {
+              "code": "100",
+              "desc": "Mandante di sviluppo"
+            },
+            {
+              "code": "200",
+              "desc": "Mandante di test / qualità"
+            },
+            {
+              "code": "500",
+              "desc": "Mandante di produzione"
+            }
+          ],
+          "businessMeaning": "Isola i dati aziendali all'interno della stessa istanza del database SAP."
         },
         {
           "position": 2,
@@ -983,7 +1201,18 @@ window.ABAP_DICTIONARY = {
               "decimals": 0,
               "shortText": "Divisione"
             }
-          }
+          },
+          "examples": [
+            {
+              "code": "1000",
+              "desc": "Stabilimento Milano / Sede centrale"
+            },
+            {
+              "code": "1010",
+              "desc": "Stabilimento Produzione Torino"
+            }
+          ],
+          "businessMeaning": "Unità organizzativa deputata alla produzione, immagazzinamento o spedizione merci."
         },
         {
           "position": 10,
@@ -1046,7 +1275,22 @@ window.ABAP_DICTIONARY = {
               "decimals": 0,
               "shortText": "Mandante"
             }
-          }
+          },
+          "examples": [
+            {
+              "code": "100",
+              "desc": "Mandante di sviluppo"
+            },
+            {
+              "code": "200",
+              "desc": "Mandante di test / qualità"
+            },
+            {
+              "code": "500",
+              "desc": "Mandante di produzione"
+            }
+          ],
+          "businessMeaning": "Isola i dati aziendali all'interno della stessa istanza del database SAP."
         },
         {
           "position": 2,
@@ -1205,7 +1449,22 @@ window.ABAP_DICTIONARY = {
               "decimals": 0,
               "shortText": "Mandante"
             }
-          }
+          },
+          "examples": [
+            {
+              "code": "100",
+              "desc": "Mandante di sviluppo"
+            },
+            {
+              "code": "200",
+              "desc": "Mandante di test / qualità"
+            },
+            {
+              "code": "500",
+              "desc": "Mandante di produzione"
+            }
+          ],
+          "businessMeaning": "Isola i dati aziendali all'interno della stessa istanza del database SAP."
         },
         {
           "position": 2,
@@ -1313,7 +1572,18 @@ window.ABAP_DICTIONARY = {
               "decimals": 0,
               "shortText": "Divisione"
             }
-          }
+          },
+          "examples": [
+            {
+              "code": "1000",
+              "desc": "Stabilimento Milano / Sede centrale"
+            },
+            {
+              "code": "1010",
+              "desc": "Stabilimento Produzione Torino"
+            }
+          ],
+          "businessMeaning": "Unità organizzativa deputata alla produzione, immagazzinamento o spedizione merci."
         },
         {
           "position": 8,
@@ -1381,7 +1651,22 @@ window.ABAP_DICTIONARY = {
               "decimals": 0,
               "shortText": "Mandante"
             }
-          }
+          },
+          "examples": [
+            {
+              "code": "100",
+              "desc": "Mandante di sviluppo"
+            },
+            {
+              "code": "200",
+              "desc": "Mandante di test / qualità"
+            },
+            {
+              "code": "500",
+              "desc": "Mandante di produzione"
+            }
+          ],
+          "businessMeaning": "Isola i dati aziendali all'interno della stessa istanza del database SAP."
         },
         {
           "position": 2,
@@ -1453,7 +1738,34 @@ window.ABAP_DICTIONARY = {
               "decimals": 0,
               "shortText": "Tipo materiale"
             }
-          }
+          },
+          "examples": [
+            {
+              "code": "FERT",
+              "desc": "Prodotto Finito (Fertigerzeugnis): prodotto internamente e pronto per la vendita"
+            },
+            {
+              "code": "ROH",
+              "desc": "Materia Prima (Rohstoff): acquistata dall'esterno per essere lavorata in produzione"
+            },
+            {
+              "code": "HALB",
+              "desc": "Semilavorato (Halbfabrikat): componente intermedio del ciclo produttivo"
+            },
+            {
+              "code": "HAWA",
+              "desc": "Merce per commercio (Handelsware): acquistata e rivenduta senza alcuna lavorazione"
+            },
+            {
+              "code": "DIEN",
+              "desc": "Servizio / Prestazione (Dienstleistung): bene immateriale (consulenza, manodopera)"
+            },
+            {
+              "code": "VERP",
+              "desc": "Materiale di imballaggio (Verpackung)"
+            }
+          ],
+          "businessMeaning": "Definisce se l'articolo è soggetto a gestione stock, acquisti, vendite o contabilità industriale."
         },
         {
           "position": 6,
@@ -1607,7 +1919,22 @@ window.ABAP_DICTIONARY = {
               "decimals": 0,
               "shortText": "Mandante"
             }
-          }
+          },
+          "examples": [
+            {
+              "code": "100",
+              "desc": "Mandante di sviluppo"
+            },
+            {
+              "code": "200",
+              "desc": "Mandante di test / qualità"
+            },
+            {
+              "code": "500",
+              "desc": "Mandante di produzione"
+            }
+          ],
+          "businessMeaning": "Isola i dati aziendali all'interno della stessa istanza del database SAP."
         },
         {
           "position": 2,
@@ -1643,7 +1970,18 @@ window.ABAP_DICTIONARY = {
               "decimals": 0,
               "shortText": "Divisione"
             }
-          }
+          },
+          "examples": [
+            {
+              "code": "1000",
+              "desc": "Stabilimento Milano / Sede centrale"
+            },
+            {
+              "code": "1010",
+              "desc": "Stabilimento Produzione Torino"
+            }
+          ],
+          "businessMeaning": "Unità organizzativa deputata alla produzione, immagazzinamento o spedizione merci."
         },
         {
           "position": 4,
@@ -1661,7 +1999,26 @@ window.ABAP_DICTIONARY = {
               "decimals": 0,
               "shortText": "Metodo MRP"
             }
-          }
+          },
+          "examples": [
+            {
+              "code": "PD",
+              "desc": "MRP deterministico standard (calcola fabbisogni su base ordini e previsioni)"
+            },
+            {
+              "code": "VB",
+              "desc": "Pianificazione manuale a punto di riordino (riordina quando scorta < soglia)"
+            },
+            {
+              "code": "VM",
+              "desc": "Pianificazione automatica a punto di riordino (calcolata con trend statistico)"
+            },
+            {
+              "code": "ND",
+              "desc": "Nessuna pianificazione MRP (gestione a vista o non riordinabile)"
+            }
+          ],
+          "businessMeaning": "Determina l'algoritmo con cui il sistema SAP calcola quando e quanto acquistare o produrre."
         },
         {
           "position": 5,
@@ -1757,7 +2114,22 @@ window.ABAP_DICTIONARY = {
               "decimals": 0,
               "shortText": "Mandante"
             }
-          }
+          },
+          "examples": [
+            {
+              "code": "100",
+              "desc": "Mandante di sviluppo"
+            },
+            {
+              "code": "200",
+              "desc": "Mandante di test / qualità"
+            },
+            {
+              "code": "500",
+              "desc": "Mandante di produzione"
+            }
+          ],
+          "businessMeaning": "Isola i dati aziendali all'interno della stessa istanza del database SAP."
         },
         {
           "position": 2,
@@ -1793,7 +2165,18 @@ window.ABAP_DICTIONARY = {
               "decimals": 0,
               "shortText": "Divisione"
             }
-          }
+          },
+          "examples": [
+            {
+              "code": "1000",
+              "desc": "Stabilimento Milano / Sede centrale"
+            },
+            {
+              "code": "1010",
+              "desc": "Stabilimento Produzione Torino"
+            }
+          ],
+          "businessMeaning": "Unità organizzativa deputata alla produzione, immagazzinamento o spedizione merci."
         },
         {
           "position": 4,
@@ -1910,7 +2293,22 @@ window.ABAP_DICTIONARY = {
               "decimals": 0,
               "shortText": "Mandante"
             }
-          }
+          },
+          "examples": [
+            {
+              "code": "100",
+              "desc": "Mandante di sviluppo"
+            },
+            {
+              "code": "200",
+              "desc": "Mandante di test / qualità"
+            },
+            {
+              "code": "500",
+              "desc": "Mandante di produzione"
+            }
+          ],
+          "businessMeaning": "Isola i dati aziendali all'interno della stessa istanza del database SAP."
         },
         {
           "position": 2,
@@ -1946,7 +2344,18 @@ window.ABAP_DICTIONARY = {
               "decimals": 0,
               "shortText": "Società"
             }
-          }
+          },
+          "examples": [
+            {
+              "code": "1000",
+              "desc": "Società Italia S.p.A."
+            },
+            {
+              "code": "2000",
+              "desc": "Società Germania GmbH"
+            }
+          ],
+          "businessMeaning": "Soggetto giuridico indipendente che redige il proprio bilancio d'esercizio."
         },
         {
           "position": 4,
@@ -1964,7 +2373,26 @@ window.ABAP_DICTIONARY = {
               "decimals": 0,
               "shortText": "Categoria ODA"
             }
-          }
+          },
+          "examples": [
+            {
+              "code": "F",
+              "desc": "Ordine d'acquisto effettivo (Purchase Order / ODA)"
+            },
+            {
+              "code": "K",
+              "desc": "Contratto quadro a valore o quantità (Contract)"
+            },
+            {
+              "code": "L",
+              "desc": "Piano di consegne programmato (Scheduling Agreement)"
+            },
+            {
+              "code": "A",
+              "desc": "Richiesta di offerta fornitore (Request for Quotation / RFQ)"
+            }
+          ],
+          "businessMeaning": "Distingue un ordine esecutivo immediato da un accordo a lungo termine o preventivo."
         },
         {
           "position": 5,
@@ -1982,7 +2410,22 @@ window.ABAP_DICTIONARY = {
               "decimals": 0,
               "shortText": "Tipo documento acquisti"
             }
-          }
+          },
+          "examples": [
+            {
+              "code": "NB",
+              "desc": "Ordine d'acquisto standard verso fornitore terzo"
+            },
+            {
+              "code": "UB",
+              "desc": "Ordine di trasferimento stock tra stabilimenti aziendali"
+            },
+            {
+              "code": "FO",
+              "desc": "Ordine quadro per prestazioni di servizi ripetitive"
+            }
+          ],
+          "businessMeaning": "Determina il tipo documento, il range numerico e le regole di approvazione/workflow."
         },
         {
           "position": 6,
@@ -2118,7 +2561,22 @@ window.ABAP_DICTIONARY = {
               "decimals": 0,
               "shortText": "Mandante"
             }
-          }
+          },
+          "examples": [
+            {
+              "code": "100",
+              "desc": "Mandante di sviluppo"
+            },
+            {
+              "code": "200",
+              "desc": "Mandante di test / qualità"
+            },
+            {
+              "code": "500",
+              "desc": "Mandante di produzione"
+            }
+          ],
+          "businessMeaning": "Isola i dati aziendali all'interno della stessa istanza del database SAP."
         },
         {
           "position": 2,
@@ -2208,7 +2666,18 @@ window.ABAP_DICTIONARY = {
               "decimals": 0,
               "shortText": "Divisione"
             }
-          }
+          },
+          "examples": [
+            {
+              "code": "1000",
+              "desc": "Stabilimento Milano / Sede centrale"
+            },
+            {
+              "code": "1010",
+              "desc": "Stabilimento Produzione Torino"
+            }
+          ],
+          "businessMeaning": "Unità organizzativa deputata alla produzione, immagazzinamento o spedizione merci."
         },
         {
           "position": 7,
@@ -2327,7 +2796,22 @@ window.ABAP_DICTIONARY = {
               "decimals": 0,
               "shortText": "Mandante"
             }
-          }
+          },
+          "examples": [
+            {
+              "code": "100",
+              "desc": "Mandante di sviluppo"
+            },
+            {
+              "code": "200",
+              "desc": "Mandante di test / qualità"
+            },
+            {
+              "code": "500",
+              "desc": "Mandante di produzione"
+            }
+          ],
+          "businessMeaning": "Isola i dati aziendali all'interno della stessa istanza del database SAP."
         },
         {
           "position": 2,
@@ -2345,7 +2829,18 @@ window.ABAP_DICTIONARY = {
               "decimals": 0,
               "shortText": "Società"
             }
-          }
+          },
+          "examples": [
+            {
+              "code": "1000",
+              "desc": "Società Italia S.p.A."
+            },
+            {
+              "code": "2000",
+              "desc": "Società Germania GmbH"
+            }
+          ],
+          "businessMeaning": "Soggetto giuridico indipendente che redige il proprio bilancio d'esercizio."
         },
         {
           "position": 3,
@@ -2399,7 +2894,38 @@ window.ABAP_DICTIONARY = {
               "decimals": 0,
               "shortText": "Tipo documento"
             }
-          }
+          },
+          "examples": [
+            {
+              "code": "DR",
+              "desc": "Fattura Cliente (Debitor Rechnung): generata in automatico da SD o registrata in FI"
+            },
+            {
+              "code": "DZ",
+              "desc": "Incasso / Pagamento Cliente (Debitor Zahlung)"
+            },
+            {
+              "code": "DG",
+              "desc": "Nota di accredito a Cliente"
+            },
+            {
+              "code": "KR",
+              "desc": "Fattura Fornitore (Kreditor Rechnung)"
+            },
+            {
+              "code": "KZ",
+              "desc": "Pagamento Fornitore (Kreditor Zahlung)"
+            },
+            {
+              "code": "SA",
+              "desc": "Prima nota di Contabilità Generale (Sachkonto Beleg)"
+            },
+            {
+              "code": "AB",
+              "desc": "Compensazione contabile generale (Ausgleichsbeleg)"
+            }
+          ],
+          "businessMeaning": "Classifica la registrazione contabile a fini civilistici, fiscali e per il range di numerazione."
         },
         {
           "position": 6,
@@ -2542,7 +3068,22 @@ window.ABAP_DICTIONARY = {
               "decimals": 0,
               "shortText": "Mandante"
             }
-          }
+          },
+          "examples": [
+            {
+              "code": "100",
+              "desc": "Mandante di sviluppo"
+            },
+            {
+              "code": "200",
+              "desc": "Mandante di test / qualità"
+            },
+            {
+              "code": "500",
+              "desc": "Mandante di produzione"
+            }
+          ],
+          "businessMeaning": "Isola i dati aziendali all'interno della stessa istanza del database SAP."
         },
         {
           "position": 2,
@@ -2560,7 +3101,18 @@ window.ABAP_DICTIONARY = {
               "decimals": 0,
               "shortText": "Società"
             }
-          }
+          },
+          "examples": [
+            {
+              "code": "1000",
+              "desc": "Società Italia S.p.A."
+            },
+            {
+              "code": "2000",
+              "desc": "Società Germania GmbH"
+            }
+          ],
+          "businessMeaning": "Soggetto giuridico indipendente che redige il proprio bilancio d'esercizio."
         },
         {
           "position": 3,
@@ -2632,7 +3184,42 @@ window.ABAP_DICTIONARY = {
               "decimals": 0,
               "shortText": "Chiave registrazione"
             }
-          }
+          },
+          "examples": [
+            {
+              "code": "01",
+              "desc": "Fattura Cliente (Dare partita aperta, aumenta il credito)"
+            },
+            {
+              "code": "11",
+              "desc": "Nota di credito Cliente (Avere partita aperta, riduce il credito)"
+            },
+            {
+              "code": "15",
+              "desc": "Incasso da Cliente (Avere, chiude la partita aperta)"
+            },
+            {
+              "code": "31",
+              "desc": "Fattura Fornitore (Avere partita aperta, aumenta il debito)"
+            },
+            {
+              "code": "21",
+              "desc": "Nota di credito Fornitore (Dare partita aperta, riduce il debito)"
+            },
+            {
+              "code": "25",
+              "desc": "Pagamento a Fornitore (Dare, chiude il debito)"
+            },
+            {
+              "code": "40",
+              "desc": "Dare su conto di mastro Co.Ge. (es. Costo o Cassa)"
+            },
+            {
+              "code": "50",
+              "desc": "Avere su conto di mastro Co.Ge. (es. Ricavo o Banca)"
+            }
+          ],
+          "businessMeaning": "Controlla l'effetto contabile (Dare o Avere), il tipo di conto movimentato e i campi obbligatori a video."
         },
         {
           "position": 7,
@@ -2650,7 +3237,30 @@ window.ABAP_DICTIONARY = {
               "decimals": 0,
               "shortText": "Tipo conto"
             }
-          }
+          },
+          "examples": [
+            {
+              "code": "D",
+              "desc": "Clienti / Debitori (Debitor)"
+            },
+            {
+              "code": "K",
+              "desc": "Fornitori / Creditori (Kreditor)"
+            },
+            {
+              "code": "S",
+              "desc": "Conti di Mastro Co.Ge. (Sachkonto)"
+            },
+            {
+              "code": "A",
+              "desc": "Cespiti e Beni Ammortizzabili (Anlagen)"
+            },
+            {
+              "code": "M",
+              "desc": "Materiali e Rimanenze (Material)"
+            }
+          ],
+          "businessMeaning": "Specifica quale sub-ledger (partitario speciale) viene aggiornato dalla riga contabile."
         },
         {
           "position": 8,
@@ -2668,7 +3278,18 @@ window.ABAP_DICTIONARY = {
               "decimals": 0,
               "shortText": "Indicatore Dare/Avere"
             }
-          }
+          },
+          "examples": [
+            {
+              "code": "S",
+              "desc": "Soll = DARE (Addebito patrimoniale o costo)"
+            },
+            {
+              "code": "H",
+              "desc": "Haben = AVERE (Accredito patrimoniale o ricavo)"
+            }
+          ],
+          "businessMeaning": "Direzione algebrica della registrazione sul conto contabile."
         },
         {
           "position": 9,
@@ -2821,7 +3442,22 @@ window.ABAP_DICTIONARY = {
               "decimals": 0,
               "shortText": "Mandante"
             }
-          }
+          },
+          "examples": [
+            {
+              "code": "100",
+              "desc": "Mandante di sviluppo"
+            },
+            {
+              "code": "200",
+              "desc": "Mandante di test / qualità"
+            },
+            {
+              "code": "500",
+              "desc": "Mandante di produzione"
+            }
+          ],
+          "businessMeaning": "Isola i dati aziendali all'interno della stessa istanza del database SAP."
         },
         {
           "position": 2,
@@ -2992,7 +3628,22 @@ window.ABAP_DICTIONARY = {
               "decimals": 0,
               "shortText": "Mandante"
             }
-          }
+          },
+          "examples": [
+            {
+              "code": "100",
+              "desc": "Mandante di sviluppo"
+            },
+            {
+              "code": "200",
+              "desc": "Mandante di test / qualità"
+            },
+            {
+              "code": "500",
+              "desc": "Mandante di produzione"
+            }
+          ],
+          "businessMeaning": "Isola i dati aziendali all'interno della stessa istanza del database SAP."
         },
         {
           "position": 2,
@@ -3162,7 +3813,18 @@ window.ABAP_DICTIONARY = {
               "decimals": 0,
               "shortText": "Ledger"
             }
-          }
+          },
+          "examples": [
+            {
+              "code": "0L",
+              "desc": "Leading Ledger: il libro mastro principale conforme ai principi contabili nazionali"
+            },
+            {
+              "code": "2L",
+              "desc": "Non-Leading Ledger: libro mastro parallelo conforme a standard IFRS o US-GAAP"
+            }
+          ],
+          "businessMeaning": "Consente la gestione contabile multi-principio (multi-GAAP) nello stesso documento S/4HANA."
         },
         {
           "position": 3,
