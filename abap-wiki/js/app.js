@@ -1,5 +1,7 @@
 /**
- * ABAP Data Dictionary Wiki - Main Application Logic
+ * ABAP Data Dictionary Wiki — Main Application Logic
+ * Supporto per navigazione ad albero a 3 livelli (Modulo -> Tabella -> Campo)
+ * e Pagine Dettagliate complete per ogni singola colonna.
  */
 
 (function () {
@@ -8,10 +10,11 @@
   // Application State
   const state = {
     dictionary: null,
-    activeTable: null,
+    activeTable: 'VBRK',
+    activeField: null, // If set, displays the dedicated field page
     searchQuery: '',
     expandedModules: new Set(['SD', 'MM', 'FI', 'S4']),
-    expandedFields: new Set(),
+    expandedTables: new Set(['VBRK']),
     theme: localStorage.getItem('abap-wiki-theme') || 'dark'
   };
 
@@ -62,7 +65,7 @@
   }
 
   /**
-   * Load Data (Pre-bundled or Local Storage or Fetch)
+   * Load Data
    */
   function initData() {
     let baseData = null;
@@ -71,7 +74,7 @@
       baseData = window.ABAP_DICTIONARY;
     }
 
-    // Merge any custom user-imported tables from localStorage
+    // Merge custom user-imported tables from localStorage
     const customTables = JSON.parse(localStorage.getItem('abap-custom-tables') || '[]');
     if (baseData && customTables.length > 0) {
       customTables.forEach(customTable => {
@@ -88,7 +91,7 @@
     updateCounts();
     renderTree();
 
-    // Auto-select first table (e.g. VBRK)
+    // Default: select VBRK
     if (state.dictionary && state.dictionary.tables.length > 0) {
       selectTable('VBRK');
     }
@@ -97,36 +100,21 @@
   function updateCounts() {
     if (!state.dictionary) return;
     const total = state.dictionary.tables.length;
-    el.tableCountBadge.textContent = `${total} Tabelle`;
+    let totalFields = 0;
+    state.dictionary.tables.forEach(t => {
+      if (t.fields) totalFields += t.fields.length;
+    });
+    el.tableCountBadge.textContent = `${total} Tabelle (${totalFields} Campi)`;
   }
 
   /**
-   * Render Hierarchical Tree Navigation
+   * Render Hierarchical Tree Navigation (Level 1: Module -> Level 2: Table -> Level 3: Field)
    */
   function renderTree() {
     if (!state.dictionary) return;
 
-    const query = state.query ? state.query.toLowerCase().trim() : '';
+    const q = state.searchQuery.toLowerCase().trim();
     let filteredTables = state.dictionary.tables;
-
-    if (state.searchQuery) {
-      const q = state.searchQuery.toLowerCase();
-      filteredTables = state.dictionary.tables.filter(table => {
-        const matchTable = table.tableName.toLowerCase().includes(q) ||
-                           (table.shortText && table.shortText.toLowerCase().includes(q)) ||
-                           (table.germanEtymology && table.germanEtymology.toLowerCase().includes(q));
-        const matchFields = table.fields && table.fields.some(f => 
-          f.fieldname.toLowerCase().includes(q) ||
-          (f.shortText && f.shortText.toLowerCase().includes(q)) ||
-          (f.germanName && f.germanName.toLowerCase().includes(q)) ||
-          (f.dataElement && f.dataElement.name.toLowerCase().includes(q)) ||
-          (f.dataElement && f.dataElement.domain && f.dataElement.domain.name.toLowerCase().includes(q)) ||
-          (f.businessMeaning && f.businessMeaning.toLowerCase().includes(q)) ||
-          (f.examples && f.examples.some(ex => ex.code.toLowerCase().includes(q) || ex.desc.toLowerCase().includes(q)))
-        );
-        return matchTable || matchFields;
-      });
-    }
 
     // Group tables by module
     const moduleMap = {};
@@ -134,17 +122,37 @@
       moduleMap[m.id] = { ...m, tables: [] };
     });
 
-    // Default container for orphan or custom tables
     if (!moduleMap['CUSTOM']) {
       moduleMap['CUSTOM'] = { id: 'CUSTOM', name: 'Tabelle Personalizzate (Z*)', tables: [] };
     }
 
-    filteredTables.forEach(tbl => {
-      const modId = tbl.module || 'CUSTOM';
+    filteredTables.forEach(table => {
+      const modId = table.module || 'CUSTOM';
       if (!moduleMap[modId]) {
         moduleMap[modId] = { id: modId, name: modId, tables: [] };
       }
-      moduleMap[modId].tables.push(tbl);
+
+      if (!q) {
+        moduleMap[modId].tables.push(table);
+      } else {
+        const matchTable = table.tableName.toLowerCase().includes(q) ||
+                           (table.shortText && table.shortText.toLowerCase().includes(q));
+        const matchFields = table.fields && table.fields.some(f => 
+          f.fieldname.toLowerCase().includes(q) ||
+          (f.shortText && f.shortText.toLowerCase().includes(q)) ||
+          (f.germanName && f.germanName.toLowerCase().includes(q)) ||
+          (f.dataElement && f.dataElement.name.toLowerCase().includes(q)) ||
+          (f.businessMeaning && f.businessMeaning.toLowerCase().includes(q)) ||
+          (f.examples && f.examples.some(ex => ex.code.toLowerCase().includes(q) || ex.desc.toLowerCase().includes(q)))
+        );
+
+        if (matchTable || matchFields) {
+          moduleMap[modId].tables.push(table);
+          // Auto-expand this module and table during search
+          state.expandedModules.add(modId);
+          state.expandedTables.add(table.tableName);
+        }
+      }
     });
 
     el.treeContainer.innerHTML = '';
@@ -152,20 +160,20 @@
     Object.values(moduleMap).forEach(mod => {
       if (mod.tables.length === 0) return;
 
-      const isExpanded = state.expandedModules.has(mod.id) || state.searchQuery.length > 0;
+      const isModExpanded = state.expandedModules.has(mod.id);
 
       const modWrapper = document.createElement('div');
       modWrapper.className = 'tree-module';
 
-      const header = document.createElement('div');
-      header.className = 'tree-module-header';
-      header.innerHTML = `
-        <span class="tree-arrow ${isExpanded ? 'expanded' : ''}">▶</span>
-        <span>${escapeHtml(mod.id)} - ${escapeHtml(mod.name)}</span>
+      const modHeader = document.createElement('div');
+      modHeader.className = 'tree-module-header';
+      modHeader.innerHTML = `
+        <span class="tree-arrow ${isModExpanded ? 'expanded' : ''}">▶</span>
+        <span><strong>${escapeHtml(mod.id)}</strong> — ${escapeHtml(mod.name)}</span>
         <span class="field-count">(${mod.tables.length})</span>
       `;
 
-      header.addEventListener('click', () => {
+      modHeader.addEventListener('click', () => {
         if (state.expandedModules.has(mod.id)) {
           state.expandedModules.delete(mod.id);
         } else {
@@ -174,24 +182,88 @@
         renderTree();
       });
 
-      modWrapper.appendChild(header);
+      modWrapper.appendChild(modHeader);
 
-      if (isExpanded) {
+      if (isModExpanded) {
         const tableList = document.createElement('div');
         tableList.className = 'tree-table-list';
 
         mod.tables.forEach(table => {
-          const item = document.createElement('div');
-          item.className = `tree-table-item ${state.activeTable === table.tableName ? 'active' : ''}`;
-          item.innerHTML = `
-            <span class="table-name-mono">${escapeHtml(table.tableName)}</span>
-            <span class="field-count">${table.fields ? table.fields.length : 0} col.</span>
+          const isTableExpanded = state.expandedTables.has(table.tableName);
+          const isTableActive = (state.activeTable === table.tableName && !state.activeField);
+
+          const tableNode = document.createElement('div');
+          tableNode.className = 'tree-table-node';
+
+          const tableRow = document.createElement('div');
+          tableRow.className = `tree-table-row ${isTableActive ? 'active' : ''}`;
+          tableRow.innerHTML = `
+            <div class="table-row-left">
+              <span class="tree-arrow ${isTableExpanded ? 'expanded' : ''}" data-toggle-table="${escapeHtml(table.tableName)}">▶</span>
+              <span class="table-name-mono">${escapeHtml(table.tableName)}</span>
+            </div>
+            <span class="field-count">${table.fields ? table.fields.length : 0}</span>
           `;
-          item.addEventListener('click', (e) => {
-            e.stopPropagation();
+
+          tableRow.addEventListener('click', (e) => {
+            // If click is on arrow, just toggle fields expansion
+            if (e.target.dataset.toggleTable) {
+              if (state.expandedTables.has(table.tableName)) {
+                state.expandedTables.delete(table.tableName);
+              } else {
+                state.expandedTables.add(table.tableName);
+              }
+              renderTree();
+              return;
+            }
+
+            // Normal click: select table overview and ensure expanded
+            state.expandedTables.add(table.tableName);
             selectTable(table.tableName);
           });
-          tableList.appendChild(item);
+
+          tableNode.appendChild(tableRow);
+
+          // Level 3: Fields / Columns list
+          if (isTableExpanded && table.fields && table.fields.length > 0) {
+            const fieldList = document.createElement('div');
+            fieldList.className = 'tree-field-list';
+
+            table.fields.forEach(field => {
+              const isFieldActive = (state.activeTable === table.tableName && state.activeField === field.fieldname);
+              const domType = field.dataElement && field.dataElement.domain ? field.dataElement.domain.dataType : '';
+
+              // Filter field if active search
+              if (q) {
+                const matchFld = field.fieldname.toLowerCase().includes(q) ||
+                                 (field.shortText && field.shortText.toLowerCase().includes(q)) ||
+                                 (field.examples && field.examples.some(ex => ex.code.toLowerCase().includes(q) || ex.desc.toLowerCase().includes(q)));
+                const matchTbl = table.tableName.toLowerCase().includes(q);
+                if (!matchFld && !matchTbl) return;
+              }
+
+              const fieldItem = document.createElement('div');
+              fieldItem.className = `tree-field-item ${isFieldActive ? 'active' : ''}`;
+              fieldItem.innerHTML = `
+                <div class="field-item-name">
+                  <span>${escapeHtml(field.fieldname)}</span>
+                  ${field.isKey ? '<span class="badge-key">KEY</span>' : ''}
+                </div>
+                <span class="field-type-dim">${escapeHtml(domType)}</span>
+              `;
+
+              fieldItem.addEventListener('click', (e) => {
+                e.stopPropagation();
+                selectField(table.tableName, field.fieldname);
+              });
+
+              fieldList.appendChild(fieldItem);
+            });
+
+            tableNode.appendChild(fieldList);
+          }
+
+          tableList.appendChild(tableNode);
         });
 
         modWrapper.appendChild(tableList);
@@ -202,7 +274,7 @@
   }
 
   /**
-   * Select & Display a Table
+   * Select & Display Table Overview
    */
   function selectTable(tableName) {
     if (!state.dictionary) return;
@@ -210,21 +282,241 @@
     if (!table) return;
 
     state.activeTable = tableName;
-    state.expandedFields.clear(); // reset expanded field details
+    state.activeField = null; // show table overview
+    state.expandedTables.add(tableName);
     renderTree();
     renderTableDetail(table);
+
+    const scrollArea = document.querySelector('.main-content');
+    if (scrollArea) scrollArea.scrollTop = 0;
   }
 
   /**
-   * Render Table Detail in Main Pane
+   * Select & Display Dedicated Complete Field Page (100% Info)
+   */
+  function selectField(tableName, fieldname) {
+    if (!state.dictionary) return;
+    const table = state.dictionary.tables.find(t => t.tableName === tableName);
+    if (!table) return;
+    const field = table.fields.find(f => f.fieldname === fieldname);
+    if (!field) return;
+
+    state.activeTable = tableName;
+    state.activeField = fieldname;
+    state.expandedTables.add(tableName);
+    renderTree();
+    renderFieldDetail(table, field);
+
+    const scrollArea = document.querySelector('.main-content');
+    if (scrollArea) scrollArea.scrollTop = 0;
+  }
+
+  /**
+   * Render Dedicated Field Page (100% Info on Single Column)
+   */
+  function renderFieldDetail(table, field) {
+    el.emptyState.style.display = 'none';
+    el.tableDetailContainer.style.display = 'block';
+
+    const elem = field.dataElement || {};
+    const dom = elem.domain || {};
+    const domType = dom.dataType ? `${dom.dataType}(${dom.length}${dom.decimals ? ',' + dom.decimals : ''})` : 'N/A';
+    const isKey = field.isKey;
+
+    let html = `
+      <!-- Breadcrumb Bar -->
+      <div class="breadcrumb-bar">
+        <span class="breadcrumb-link" onclick="window.ABAP_APP.selectTable('${escapeHtml(table.tableName)}')">Modulo ${escapeHtml(table.module)}</span>
+        <span>/</span>
+        <span class="breadcrumb-link" onclick="window.ABAP_APP.selectTable('${escapeHtml(table.tableName)}')">Tabella ${escapeHtml(table.tableName)}</span>
+        <span>/</span>
+        <strong style="color: var(--text-primary);">${escapeHtml(field.fieldname)}</strong>
+      </div>
+
+      <!-- Field Page Header -->
+      <div class="field-page-header">
+        <div class="field-page-title-row">
+          <span class="field-page-title">${escapeHtml(table.tableName)}-${escapeHtml(field.fieldname)}</span>
+          ${isKey ? '<span class="badge-key" style="font-size: 11px; padding: 2px 6px;">PRIMARY KEY</span>' : ''}
+          <span class="badge-datatype">${escapeHtml(domType)}</span>
+        </div>
+        <p class="field-page-desc">${escapeHtml(field.shortText || '')}</p>
+      </div>
+
+      <!-- Quick ABAP Declaration Snippet -->
+      <div class="snippet-box">
+        <span class="snippet-code">DATA lv_${field.fieldname.toLowerCase()} TYPE ${table.tableName.toLowerCase()}-${field.fieldname.toLowerCase()}.</span>
+        <button class="btn-copy" onclick="copySnippet('DATA lv_${field.fieldname.toLowerCase()} TYPE ${table.tableName.toLowerCase()}-${field.fieldname.toLowerCase()}.')">Copia Snippet</button>
+      </div>
+
+      <!-- 1. Gerarchia ad Albero DDIC -->
+      <div class="section-title">1. Struttura Gerarchica ad Albero (DDIC)</div>
+      <div style="background: var(--bg-secondary); border: 1px solid var(--border-color); border-radius: 6px; padding: 12px 16px; margin-bottom: 24px; font-family: var(--font-mono); font-size: 12px; display: flex; flex-wrap: wrap; gap: 8px; align-items: center;">
+        <span>Tabella: <strong style="color: var(--accent);">${escapeHtml(table.tableName)}</strong></span>
+        <span>→</span>
+        <span>Colonna: <strong style="color: var(--accent);">${escapeHtml(field.fieldname)}</strong></span>
+        <span>→</span>
+        <span>Elemento Dati: <strong style="color: var(--text-primary);">${escapeHtml(elem.name || field.fieldname)}</strong></span>
+        <span>→</span>
+        <span>Dominio: <strong style="color: var(--text-primary);">${escapeHtml(dom.name || 'N/A')}</strong></span>
+      </div>
+
+      <!-- 2. Scheda Tecnica Completa SE11 -->
+      <div class="section-title">2. Scheda Tecnica di Dizionario (Transazione SE11)</div>
+      <table class="specs-table">
+        <tbody>
+          <tr>
+            <td class="label-col">Tabella Database</td>
+            <td class="val-col"><strong>${escapeHtml(table.tableName)}</strong> (${escapeHtml(table.shortText || '')})</td>
+          </tr>
+          <tr>
+            <td class="label-col">Nome Campo / Colonna</td>
+            <td class="val-col"><strong>${escapeHtml(field.fieldname)}</strong></td>
+          </tr>
+          <tr>
+            <td class="label-col">Etimologia Tedesca</td>
+            <td class="val-col"><em>${escapeHtml(field.germanName || 'N/A')}</em></td>
+          </tr>
+          <tr>
+            <td class="label-col">Posizione nel Record</td>
+            <td class="val-col">#${field.position || '—'}</td>
+          </tr>
+          <tr>
+            <td class="label-col">Chiave Primaria</td>
+            <td class="val-col">${isKey ? '<strong style="color: var(--key-badge);">SÌ (Primary Key componente della chiave univoca)</strong>' : 'No'}</td>
+          </tr>
+          <tr>
+            <td class="label-col">Elemento Dati (Data Element)</td>
+            <td class="val-col"><span class="badge-element">${escapeHtml(elem.name || field.fieldname)}</span> — ${escapeHtml(elem.shortText || '')}</td>
+          </tr>
+          <tr>
+            <td class="label-col">Dominio Tecnico</td>
+            <td class="val-col"><strong>${escapeHtml(dom.name || 'N/A')}</strong> — ${escapeHtml(dom.shortText || '')}</td>
+          </tr>
+          <tr>
+            <td class="label-col">Tipo Dati Tecnico</td>
+            <td class="val-col"><span class="badge-datatype">${escapeHtml(dom.dataType || 'CHAR')}</span></td>
+          </tr>
+          <tr>
+            <td class="label-col">Lunghezza Caratteri</td>
+            <td class="val-col">${dom.length || '—'} caratteri</td>
+          </tr>
+          <tr>
+            <td class="label-col">Decimali</td>
+            <td class="val-col">${dom.decimals !== undefined ? dom.decimals : 0}</td>
+          </tr>
+          <tr>
+            <td class="label-col">Formato Memoria DB</td>
+            <td class="val-col">${getInternalFormatDesc(dom.dataType, dom.length)}</td>
+          </tr>
+        </tbody>
+      </table>
+
+      <!-- 3. Significato di Business & Processo -->
+      <div class="section-title">3. Ruolo di Business & Processo Aziendale</div>
+      <div style="background: var(--bg-secondary); border-left: 3px solid var(--accent); padding: 12px 16px; border-radius: 0 4px 4px 0; margin-bottom: 24px; font-size: 13px; line-height: 1.6;">
+        <p><strong>Cosa rappresenta:</strong> ${escapeHtml(field.businessMeaning || field.shortText || '')}</p>
+        <p style="margin-top: 8px; color: var(--text-secondary);">
+          Nel contesto della tabella <strong>${escapeHtml(table.tableName)}</strong>, questo campo viene valorizzato automaticamente dalle transazioni standard di SAP (es. salvataggio ordine, creazione fattura, registrazione prima nota) oppure attraverso programmi ABAP personalizzati.
+        </p>
+      </div>
+
+      <!-- 4. Valori Ammessi ed Esempi Reali di Business -->
+      <div class="section-title">4. Valori Ammessi ed Esempi Concreti di Business</div>
+    `;
+
+    if (field.examples && field.examples.length > 0) {
+      html += `
+        <table class="examples-table">
+          <thead>
+            <tr>
+              <th style="width: 120px;">Valore / Codice</th>
+              <th>Descrizione del Significato</th>
+              <th>Contesto Operativo Reale</th>
+            </tr>
+          </thead>
+          <tbody>
+      `;
+      field.examples.forEach(ex => {
+        html += `
+          <tr>
+            <td><strong style="color: var(--accent); font-family: var(--font-mono); font-size: 13px;">${escapeHtml(ex.code)}</strong></td>
+            <td><strong>${escapeHtml(ex.desc)}</strong></td>
+            <td style="color: var(--text-secondary); font-size: 11px;">Standard SAP / Sistema di Produzione</td>
+          </tr>
+        `;
+      });
+      html += `
+          </tbody>
+        </table>
+      `;
+    } else {
+      html += `
+        <div style="background: var(--bg-secondary); border: 1px solid var(--border-color); border-radius: 4px; padding: 10px 14px; margin-bottom: 24px; font-size: 12px; color: var(--text-muted);">
+          Questo campo memorizza valori dinamici di business (come date, numeri di documento, descrizioni testuali o codici anagrafici) conformi al tipo tecnico <code>${escapeHtml(domType)}</code>.
+        </div>
+      `;
+    }
+
+    // 5. Guida Pratica ABAP per il campo
+    html += `
+      <div class="section-title">5. Guida Pratica ABAP per questo Campo</div>
+      <div style="background: var(--bg-code); border: 1px solid var(--border-color); border-radius: 6px; padding: 14px 18px; font-family: var(--font-mono); font-size: 12px; line-height: 1.6; margin-bottom: 24px;">
+        <span style="color: var(--text-muted);">" 1. Dichiarazione variabile locale agganciata al campo</span><br>
+        <span style="color: var(--accent); font-weight: 600;">DATA</span> lv_${field.fieldname.toLowerCase()} <span style="color: var(--accent); font-weight: 600;">TYPE</span> ${table.tableName.toLowerCase()}-${field.fieldname.toLowerCase()}.<br><br>
+
+        <span style="color: var(--text-muted);">" 2. Selezione da database con lettura di questo campo</span><br>
+        <span style="color: var(--accent); font-weight: 600;">SELECT SINGLE</span> ${field.fieldname.toLowerCase()}<br>
+        &nbsp;&nbsp;<span style="color: var(--accent); font-weight: 600;">FROM</span> ${table.tableName.toLowerCase()}<br>
+        &nbsp;&nbsp;<span style="color: var(--accent); font-weight: 600;">WHERE</span> mandt = @sy-mandt<br>
+        &nbsp;&nbsp;<span style="color: var(--accent); font-weight: 600;">INTO</span> @lv_${field.fieldname.toLowerCase()}.<br><br>
+
+        <span style="color: var(--text-muted);">" 3. Utilizzo nella clausola WHERE come filtro</span><br>
+        <span style="color: var(--accent); font-weight: 600;">SELECT</span> * <span style="color: var(--accent); font-weight: 600;">FROM</span> ${table.tableName.toLowerCase()}<br>
+        &nbsp;&nbsp;<span style="color: var(--accent); font-weight: 600;">WHERE</span> ${field.fieldname.toLowerCase()} = @lv_${field.fieldname.toLowerCase()}<br>
+        &nbsp;&nbsp;<span style="color: var(--accent); font-weight: 600;">INTO TABLE</span> @<span style="color: var(--accent); font-weight: 600;">DATA</span>(lt_risultati).
+      </div>
+
+      <div style="margin-top: 24px; padding-top: 16px; border-top: 1px solid var(--border-color);">
+        <button class="btn" onclick="window.ABAP_APP.selectTable('${escapeHtml(table.tableName)}')">
+          ← Torna alla Panoramica della Tabella ${escapeHtml(table.tableName)}
+        </button>
+      </div>
+    `;
+
+    el.tableDetailContainer.innerHTML = html;
+  }
+
+  function getInternalFormatDesc(dataType, length) {
+    switch (dataType) {
+      case 'DATS': return 'Data di 8 cifre in formato AAAAMMGG (es. 20261124)';
+      case 'CLNT': return 'Codice mandante a 3 cifre numeriche (es. 100)';
+      case 'CHAR': return `Stringa alfanumerica a lunghezza fissa (${length} caratteri)`;
+      case 'NUMC': return `Sequenza di cifre numeriche con padding di zeri iniziali (${length} cifre)`;
+      case 'CURR': return 'Numero decimale a virgola fissa per importi valutari (memorizzato in centesimi)';
+      case 'CUKY': return 'Codice ISO divisa a 5 caratteri (es. EUR, USD, CHF)';
+      case 'UNIT': return 'Unità di misura tecnica/commerciale (es. ST/PZ, KG, M)';
+      case 'QUAN': return 'Quantità numerica con 3 cifre decimali';
+      default: return `${dataType} (${length} caratteri)`;
+    }
+  }
+
+  /**
+   * Render Table Detail Overview in Main Pane
    */
   function renderTableDetail(table) {
     el.emptyState.style.display = 'none';
     el.tableDetailContainer.style.display = 'block';
 
-    const keys = table.mainKey ? table.mainKey.join(', ') : 'N/A';
+    const keys = table.mainKey ? table.mainKey.join(', ') : 'MANDT';
 
     let html = `
+      <div class="breadcrumb-bar">
+        <span class="breadcrumb-link" onclick="window.ABAP_APP.selectModule('${escapeHtml(table.module)}')">Modulo ${escapeHtml(table.module)}</span>
+        <span>/</span>
+        <strong style="color: var(--text-primary);">Tabella ${escapeHtml(table.tableName)}</strong>
+      </div>
+
       <div class="table-header-box">
         <div class="table-title-row">
           <div class="table-title-left">
@@ -243,7 +535,8 @@
 
         ${table.germanEtymology ? `
           <div class="etymology-box">
-            <span>Etimologia Tedesca:</span> <em>${escapeHtml(table.germanEtymology)}</em>
+            <span>Etimologia Tedesca:</span> <em>${escapeHtml(table.germanEtymology)}</em><br>
+            <span style="font-size: 12px; color: var(--text-muted);">${escapeHtml(table.description || '')}</span>
           </div>
         ` : ''}
       </div>
@@ -254,7 +547,7 @@
         <button class="btn-copy" onclick="copySnippet('DATA ls_${table.tableName.toLowerCase()} TYPE ${table.tableName.toLowerCase()}.')">Copia</button>
       </div>
 
-      <div class="snippet-box" style="margin-top: -16px;">
+      <div class="snippet-box" style="margin-top: -8px;">
         <span class="snippet-code">DATA lt_${table.tableName.toLowerCase()} TYPE TABLE OF ${table.tableName.toLowerCase()}. " Tante righe (Tabella Interna)</span>
         <button class="btn-copy" onclick="copySnippet('DATA lt_${table.tableName.toLowerCase()} TYPE TABLE OF ${table.tableName.toLowerCase()}.')">Copia</button>
       </div>
@@ -278,11 +571,11 @@
       html += `</div>`;
     }
 
-    // Fields Tree Grid
+    // Fields Table with Direct Links to Full Field Pages
     html += `
       <div class="section-title">
-        <span>Colonne della Tabella (Struttura ad Albero)</span>
-        <span style="font-size: 11px; text-transform: none; color: var(--text-muted);">Clicca su una riga per esplorare Data Element e Dominio</span>
+        <span>Elenco Colonne della Tabella (Clicca sul campo per la Pagina Completa)</span>
+        <span style="font-size: 11px; text-transform: none; color: var(--text-muted);">Tutti i campi con Data Element, Dominio e Valori</span>
       </div>
       <table class="fields-tree-table">
         <thead>
@@ -293,7 +586,7 @@
             <th>Data Element</th>
             <th>Dominio</th>
             <th>Tipo & Lunghezza</th>
-            <th style="text-align: right;">Snippet ABAP</th>
+            <th style="text-align: right;">Azione</th>
           </tr>
         </thead>
         <tbody>
@@ -306,83 +599,26 @@
         const dom = field.dataElement && field.dataElement.domain ? field.dataElement.domain : null;
         const domType = dom ? `${dom.dataType}(${dom.length}${dom.decimals ? ',' + dom.decimals : ''})` : '-';
         const domName = dom ? dom.name : '-';
-        const isExpanded = state.expandedFields.has(field.fieldname);
 
         html += `
-          <tr class="field-row" onclick="window.ABAP_APP.toggleFieldDetail('${escapeHtml(field.fieldname)}')">
+          <tr class="field-row" onclick="window.ABAP_APP.selectField('${escapeHtml(table.tableName)}', '${escapeHtml(field.fieldname)}')">
             <td style="font-family: var(--font-mono); color: var(--text-muted);">${field.position || '-'}</td>
             <td>
               <span class="table-name-mono" style="color: var(--accent);">${escapeHtml(field.fieldname)}</span>
               ${isKey ? '<span class="badge-key">KEY</span>' : ''}
+              ${field.germanName ? `<br><small style="color: var(--text-muted); font-size: 10px;">${escapeHtml(field.germanName)}</small>` : ''}
             </td>
-            <td>${escapeHtml(field.shortText || '')}</td>
+            <td>
+              <strong>${escapeHtml(field.shortText || '')}</strong>
+              ${field.examples && field.examples.length > 0 ? `<br><small style="color: var(--text-muted);">Esempi: ${field.examples.slice(0, 3).map(e => e.code).join(', ')}...</small>` : ''}
+            </td>
             <td><span class="badge-element">${escapeHtml(elemName)}</span></td>
             <td><span style="font-family: var(--font-mono); font-size: 11px; color: var(--text-muted);">${escapeHtml(domName)}</span></td>
             <td><span class="badge-datatype">${escapeHtml(domType)}</span></td>
             <td style="text-align: right;">
-              <button class="btn-copy" onclick="event.stopPropagation(); copySnippet('DATA lv_${field.fieldname.toLowerCase()} TYPE ${table.tableName.toLowerCase()}-${field.fieldname.toLowerCase()}.')">
-                TYPE ${table.tableName.toLowerCase()}-${field.fieldname.toLowerCase()}
+              <button class="btn-copy" onclick="event.stopPropagation(); window.ABAP_APP.selectField('${escapeHtml(table.tableName)}', '${escapeHtml(field.fieldname)}')">
+                Vedi Scheda 100% →
               </button>
-            </td>
-          </tr>
-        `;
-
-        // Drilldown Row
-        html += `
-          <tr id="drawer-${escapeHtml(field.fieldname)}" style="display: ${isExpanded ? 'table-row' : 'none'};">
-            <td colspan="7" style="padding: 0 10px 10px 10px;">
-              <div class="field-detail-panel active">
-                <div class="detail-tree">
-                  <div class="detail-tree-branch">
-                    <span class="tree-level-label">1. Colonna:</span>
-                    <div class="tree-level-content">
-                      <strong>${escapeHtml(field.fieldname)}</strong> — ${escapeHtml(field.shortText || '')}
-                      ${field.germanName ? `<br><small style="color: var(--text-muted);">Tedesco: <em>${escapeHtml(field.germanName)}</em></small>` : ''}
-                    </div>
-                  </div>
-                  <div class="detail-tree-branch">
-                    <span class="tree-level-label">2. Data Element:</span>
-                    <div class="tree-level-content">
-                      <span class="badge-element">${escapeHtml(elemName)}</span> — ${escapeHtml(field.dataElement ? field.dataElement.shortText : '')}
-                    </div>
-                  </div>
-                  <div class="detail-tree-branch">
-                    <span class="tree-level-label">3. Dominio:</span>
-                    <div class="tree-level-content">
-                      <strong>${escapeHtml(domName)}</strong> [Tipo: <span class="badge-datatype">${escapeHtml(domType)}</span>] — ${escapeHtml(dom ? dom.shortText : '')}
-                    </div>
-                  </div>
-                  ${field.businessMeaning ? `
-                  <div class="detail-tree-branch">
-                    <span class="tree-level-label">Significato:</span>
-                    <div class="tree-level-content" style="color: var(--text-secondary);">
-                      ${escapeHtml(field.businessMeaning)}
-                    </div>
-                  </div>
-                  ` : ''}
-                  ${field.examples && field.examples.length > 0 ? `
-                  <div class="detail-tree-branch" style="margin-top: 4px;">
-                    <span class="tree-level-label">Valori / Esempi:</span>
-                    <div class="tree-level-content">
-                      <div style="background: var(--bg-primary); border: 1px solid var(--border-color); border-radius: 4px; padding: 6px 10px; margin-top: 2px;">
-                        ${field.examples.map(ex => `
-                          <div style="padding: 2px 0; font-size: 11px; display: flex; gap: 8px;">
-                            <strong style="color: var(--accent); font-family: var(--font-mono);">${escapeHtml(ex.code)}</strong>
-                            <span style="color: var(--text-primary);">— ${escapeHtml(ex.desc)}</span>
-                          </div>
-                        `).join('')}
-                      </div>
-                    </div>
-                  </div>
-                  ` : ''}
-                  <div class="detail-tree-branch" style="margin-top: 6px;">
-                    <span class="tree-level-label">Dichiarazione:</span>
-                    <div class="tree-level-content" style="color: var(--accent);">
-                      <code>DATA lv_${field.fieldname.toLowerCase()} TYPE ${table.tableName.toLowerCase()}-${field.fieldname.toLowerCase()}.</code>
-                    </div>
-                  </div>
-                </div>
-              </div>
             </td>
           </tr>
         `;
@@ -396,7 +632,7 @@
       </table>
 
       <!-- Esempio Query ABAP Reale -->
-      <div class="section-title">Esempio Query ABAP (Modern SQL)</div>
+      <div class="section-title">Esempio Pratico Query ABAP (Modern SQL)</div>
       <div style="background: var(--bg-code); border: 1px solid var(--border-color); border-radius: 6px; padding: 12px 16px; font-family: var(--font-mono); font-size: 12px; margin-bottom: 24px; color: var(--text-primary); line-height: 1.5; overflow-x: auto;">
         <span style="color: var(--text-muted);">* Selezione moderna da ${table.tableName} con dichiarazione inline</span><br>
         <span style="color: var(--accent); font-weight: 600;">SELECT</span> ${table.fields.slice(0, 5).map(f => f.fieldname.toLowerCase()).join(', ')}<br>
@@ -416,34 +652,12 @@
   }
 
   /**
-   * Toggle Field Drilldown Panel
-   */
-  function toggleFieldDetail(fieldname) {
-    if (state.expandedFields.has(fieldname)) {
-      state.expandedFields.delete(fieldname);
-    } else {
-      state.expandedFields.add(fieldname);
-    }
-    const drawer = document.getElementById(`drawer-${fieldname}`);
-    if (drawer) {
-      drawer.style.display = state.expandedFields.has(fieldname) ? 'table-row' : 'none';
-    }
-  }
-
-  /**
    * Global Copy Snippet to Clipboard
    */
   window.copySnippet = function (text) {
     navigator.clipboard.writeText(text).then(() => {
-      showToast('Copiato negli appunti: ' + text);
+      showToast('Copiato: ' + text);
     }).catch(() => {
-      // Fallback
-      const input = document.createElement('textarea');
-      input.value = text;
-      document.body.appendChild(input);
-      input.select();
-      document.execCommand('copy');
-      document.body.removeChild(input);
       showToast('Copiato: ' + text);
     });
   };
@@ -460,10 +674,10 @@
         position: fixed;
         bottom: 24px;
         right: 24px;
-        background-color: var(--text-primary);
-        color: var(--bg-primary);
+        background-color: var(--accent);
+        color: #ffffff;
         padding: 8px 16px;
-        border-radius: 6px;
+        border-radius: 4px;
         font-size: 12px;
         font-family: var(--font-mono);
         z-index: 1000;
@@ -497,17 +711,15 @@
    * Event Listeners
    */
   function initEvents() {
-    // Search with debounce
     let searchDebounce;
     el.globalSearch.addEventListener('input', (e) => {
       clearTimeout(searchDebounce);
       searchDebounce = setTimeout(() => {
         state.searchQuery = e.target.value;
         renderTree();
-      }, 150);
+      }, 120);
     });
 
-    // Keyboard shortcut '/' to search
     window.addEventListener('keydown', (e) => {
       if (e.key === '/' && document.activeElement !== el.globalSearch && document.activeElement !== el.importJsonText) {
         e.preventDefault();
@@ -516,21 +728,20 @@
       }
     });
 
-    // Expand / Collapse All
     el.btnExpandAll.addEventListener('click', () => {
       if (state.dictionary) {
         state.dictionary.modules.forEach(m => state.expandedModules.add(m.id));
-        state.expandedModules.add('CUSTOM');
+        state.dictionary.tables.forEach(t => state.expandedTables.add(t.tableName));
         renderTree();
       }
     });
 
     el.btnCollapseAll.addEventListener('click', () => {
       state.expandedModules.clear();
+      state.expandedTables.clear();
       renderTree();
     });
 
-    // Import / Export Modal
     el.btnImportModal.addEventListener('click', () => {
       el.modalImport.classList.add('active');
     });
@@ -547,9 +758,6 @@
     el.btnExportJson.addEventListener('click', handleExport);
   }
 
-  /**
-   * Handle JSON Import
-   */
   function handleImport() {
     const raw = el.importJsonText.value.trim();
     if (!raw) {
@@ -560,7 +768,6 @@
     try {
       const parsed = JSON.parse(raw);
       const tablesToAdd = Array.isArray(parsed) ? parsed : (parsed.tables || [parsed]);
-      
       const stored = JSON.parse(localStorage.getItem('abap-custom-tables') || '[]');
 
       tablesToAdd.forEach(newTable => {
@@ -595,9 +802,6 @@
     }
   }
 
-  /**
-   * Handle JSON Export
-   */
   function handleExport() {
     if (!state.dictionary) return;
     const blob = new Blob([JSON.stringify(state.dictionary, null, 2)], { type: 'application/json' });
@@ -611,10 +815,14 @@
     URL.revokeObjectURL(url);
   }
 
-  // Expose public methods for inline DOM handlers
+  // Public API
   window.ABAP_APP = {
     selectTable,
-    toggleFieldDetail
+    selectField,
+    selectModule: (modId) => {
+      state.expandedModules.add(modId);
+      renderTree();
+    }
   };
 
   // Bootstrap
