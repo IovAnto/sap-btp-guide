@@ -3,8 +3,9 @@
 > **Guida interattiva e pragmatica per lo studio, il lavoro e la certificazione su SAP Business Technology Platform (SAP BTP).**  
 > Basata sul testo ufficiale Rheinwerk / SAP PRESS *"SAP Business Technology Platform (SAP BTP): An Introduction"*.
 
-🌐 **Accedi all'applicazione live su GitHub Pages**:  
-👉 **[https://iovanto.github.io/sap-btp-guide/](https://iovanto.github.io/sap-btp-guide/)**
+🌐 **Accedi alle applicazioni live su GitHub Pages**:  
+* 👉 **[SAP BTP Master Guide](https://iovanto.github.io/sap-btp-guide/)**
+* 👉 **[ABAP Data Dictionary (DDIC) Tree Wiki](https://iovanto.github.io/sap-btp-guide/abap-wiki/)** (Reference minimale per Tabelle, Colonne, Data Element, Domini e Snippet)
 
 ---
 
