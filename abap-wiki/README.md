@@ -7,7 +7,7 @@ $$\text{Modulo (SD / MM / FI / S4)} \longrightarrow \text{Tabella} \longrightarr
 
 ---
 
-## ⚡ Caratteristiche Chiave
+## Caratteristiche Chiave
 
 * **Albero Esplorativo**: Navigazione visuale per Modulo $\rightarrow$ Tabella $\rightarrow$ Colonna $\rightarrow$ Dettaglio tecnico.
 * **Informazioni Complete DDIC**:
@@ -29,7 +29,7 @@ $$\text{Modulo (SD / MM / FI / S4)} \longrightarrow \text{Tabella} \longrightarr
 
 ---
 
-## 📂 Struttura del Progetto
+## Struttura del Progetto
 
 ```
 abap-wiki/
@@ -46,7 +46,7 @@ abap-wiki/
 
 ---
 
-## 📊 Tabelle Core Incluse nella Fase 1
+## Tabelle Core Incluse nella Fase 1
 
 1. **SD (Sales & Distribution)**:
    * `VBAK` (Testata Ordine di Vendita)
@@ -71,9 +71,9 @@ abap-wiki/
 
 ---
 
-## 🚀 Pubblicazione su GitHub Pages
+## Pubblicazione su GitHub Pages
 
 L'applicazione è posizionata in `abap-wiki/` all'interno del repository `sap-btp-guide`.
 Una volta effettuato il push su `origin main`, l'URL pubblico su GitHub Pages è:
 
-👉 **`https://iovanto.github.io/sap-btp-guide/abap-wiki/`**
+* **`https://iovanto.github.io/sap-btp-guide/abap-wiki/`**

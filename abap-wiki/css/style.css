@@ -78,6 +78,23 @@ body {
   border-bottom: 1px solid var(--border-color);
 }
 
+.nav-hub-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 0.72rem;
+  color: var(--accent);
+  text-decoration: none;
+  font-weight: 600;
+  margin-bottom: 8px;
+  font-family: var(--font-mono);
+  transition: opacity 0.15s;
+}
+
+.nav-hub-link:hover {
+  text-decoration: underline;
+}
+
 .sidebar-header h1 {
   font-size: 0.95rem;
   font-weight: 700;
@@ -354,23 +371,70 @@ body {
   line-height: 1.7;
 }
 
-/* Minimal Snippet Box */
+/* Minimal Code Snippet Box */
+.code-header-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-top: 14px;
+  margin-bottom: 4px;
+}
+
+.code-header-bar span {
+  font-size: 0.72rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--text-muted);
+}
+
 .manual-code-box {
   background: var(--code-bg);
   border: 1px solid var(--border-color);
   border-radius: 6px;
   padding: 14px 18px;
   font-family: var(--font-mono);
-  font-size: 0.82rem;
-  line-height: 1.5;
+  font-size: 0.84rem;
+  line-height: 1.6;
   color: var(--text-main);
-  margin: 16px 0 28px 0;
+  margin: 0 0 28px 0;
   overflow-x: auto;
+  white-space: pre;
 }
 
-.manual-code-box .kw { color: var(--accent); font-weight: 600; }
-.manual-code-box .tbl { color: var(--accent-orange); font-weight: 600; }
-.manual-code-box .com { color: var(--text-muted); font-style: italic; }
+.manual-code-box code {
+  font-family: inherit;
+  font-size: inherit;
+  background: none;
+  border: none;
+  padding: 0;
+  color: inherit;
+}
+
+/* Syntax Highlighting */
+.hl-kw { color: #3b82f6; font-weight: 600; }
+[data-theme="dark"] .hl-kw { color: #60a5fa; }
+[data-theme="light"] .hl-kw { color: #0284c7; }
+
+.hl-str { color: #10b981; }
+[data-theme="dark"] .hl-str { color: #34d399; }
+[data-theme="light"] .hl-str { color: #059669; }
+
+.hl-com { color: #8b92a5; font-style: italic; }
+[data-theme="dark"] .hl-com { color: #6b7280; }
+[data-theme="light"] .hl-com { color: #64748b; }
+
+.hl-sys { color: #f59e0b; font-weight: 600; }
+[data-theme="dark"] .hl-sys { color: #fbbf24; }
+[data-theme="light"] .hl-sys { color: #d97706; }
+
+.hl-num { color: #ec4899; }
+[data-theme="dark"] .hl-num { color: #f472b6; }
+[data-theme="light"] .hl-num { color: #be185d; }
+
+.hl-op { color: #94a3b8; }
+[data-theme="dark"] .hl-op { color: #cbd5e1; }
+[data-theme="light"] .hl-op { color: #475569; }
 
 /* Relationships Grid */
 .manual-rel-list {

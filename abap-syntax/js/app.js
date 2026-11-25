@@ -282,7 +282,7 @@
           </div>
 
           <!-- Syntax Signature Box -->
-          <div class="syntax-sig-box">${escapeHtml(c.syntax)}</div>
+          <div class="syntax-sig-box">${highlightABAP(c.syntax)}</div>
 
           <!-- Description & Semantic -->
           <p class="manual-p" style="font-size: 0.98rem; font-weight: 600; color: var(--text-title); margin-bottom: 6px;">
@@ -329,7 +329,7 @@
               <span>Esempio Pratico Compilabile</span>
               <button class="btn-copy-code" onclick="window.ABAP_SYNTAX_APP.copySnippet(${escapeHtml(JSON.stringify(c.exampleCode))})">Copia Codice</button>
             </div>
-            <pre class="manual-code-box"><code>${escapeHtml(c.exampleCode)}</code></pre>
+            <pre class="manual-code-box"><code>${highlightABAP(c.exampleCode)}</code></pre>
           ` : ''}
 
         </div>
@@ -353,7 +353,7 @@
     let html = `
       <div style="margin-bottom: 14px;">
         <h3 style="font-size: 1rem; font-weight: 700; color: var(--text-title); margin-bottom: 4px;">Firma Sintattica</h3>
-        <div class="syntax-sig-box" style="margin: 4px 0 12px 0;">${escapeHtml(construct.syntax)}</div>
+        <div class="syntax-sig-box" style="margin: 4px 0 12px 0;">${highlightABAP(construct.syntax)}</div>
         <p class="manual-p">${escapeHtml(construct.semantic)}</p>
       </div>
 
@@ -383,7 +383,7 @@
           <span>Esempio di Codice</span>
           <button class="btn-copy-code" onclick="window.ABAP_SYNTAX_APP.copySnippet(${escapeHtml(JSON.stringify(construct.exampleCode))})">Copia</button>
         </div>
-        <pre class="manual-code-box"><code>${escapeHtml(construct.exampleCode)}</code></pre>
+        <pre class="manual-code-box"><code>${highlightABAP(construct.exampleCode)}</code></pre>
       ` : ''}
     `;
 
@@ -432,6 +432,78 @@
       .replace(/>/g, '&gt;')
       .replace(/"/g, '&quot;')
       .replace(/'/g, '&#039;');
+  }
+
+  const keywordsSet = new Set([
+    'SELECT', 'SINGLE', 'FROM', 'WHERE', 'INTO', 'TABLE', 'APPENDING', 'CORRESPONDING', 'FIELDS',
+    'OF', 'ORDER', 'BY', 'UP', 'TO', 'ROWS', 'GROUP', 'HAVING', 'COUNT', 'SUM', 'AVG', 'MIN', 'MAX',
+    'INNER', 'JOIN', 'LEFT', 'OUTER', 'RIGHT', 'CROSS', 'ON', 'AS', 'DISTINCT',
+    'FOR', 'ALL', 'ENTRIES', 'IN', 'UNION',
+    'INSERT', 'UPDATE', 'MODIFY', 'DELETE', 'COMMIT', 'ROLLBACK', 'WORK', 'WAIT',
+    'LOOP', 'AT', 'ASSIGNING', 'FIELD-SYMBOL', 'FIELD-SYMBOLS', 'REFERENCE', 'ENDLOOP',
+    'READ', 'WITH', 'KEY', 'BINARY', 'SEARCH', 'TRANSPORTING', 'NO', 'INDEX',
+    'SORT', 'ASCENDING', 'DESCENDING', 'TEXT',
+    'FIRST', 'LAST', 'NEW', 'END', 'ENDAT', 'COLLECT', 'CLEAR', 'REFRESH', 'FREE',
+    'VALUE', 'MAPPING', 'EXCEPT', 'BASE', 'COND', 'SWITCH', 'WHEN', 'THEN', 'ELSE',
+    'REDUCE', 'INIT', 'NEXT', 'FILTER', 'CONV', 'EXACT', 'REF',
+    'IF', 'ELSEIF', 'ENDIF', 'CASE', 'WHEN', 'OTHERS', 'ENDCASE',
+    'DO', 'TIMES', 'ENDDO', 'WHILE', 'ENDWHILE', 'CHECK', 'EXIT', 'CONTINUE', 'RETURN', 'STOP',
+    'DATA', 'TYPES', 'BEGIN', 'CONSTANTS', 'STATICS', 'LIKE', 'LINE', 'TYPE', 'LENGTH', 'DECIMALS',
+    'STANDARD', 'SORTED', 'HASHED', 'UNIQUE', 'NON-UNIQUE', 'EMPTY', 'RANGE',
+    'OCCURS', 'HEADER', 'RANGES', 'TABLES',
+    'BREAK-POINT', 'BREAK', 'ASSERT', 'LOG-POINT', 'ID', 'CONDITION', 'SUBKEY',
+    'WRITE', 'ULINE', 'SKIP', 'BACK', 'POSITION', 'NEW-PAGE', 'NEW-LINE', 'FORMAT', 'COLOR',
+    'INTENSIFIED', 'INVERSE', 'RESET', 'HOTSPOT', 'HIDE', 'CURSOR', 'PF-STATUS', 'TITLEBAR',
+    'PARAMETERS', 'SELECT-OPTIONS', 'SELECTION-SCREEN', 'BLOCK', 'COMMENT', 'PUSHBUTTON',
+    'USER-COMMAND', 'DEFAULT', 'OBLIGATORY', 'RADIOBUTTON', 'CHECKBOX', 'MODIF',
+    'INITIALIZATION', 'START-OF-SELECTION', 'END-OF-SELECTION', 'OUTPUT',
+    'CLASS', 'ENDCLASS', 'DEFINITION', 'IMPLEMENTATION', 'PUBLIC', 'PROTECTED', 'PRIVATE',
+    'SECTION', 'FINAL', 'CREATE', 'METHODS', 'METHOD', 'ENDMETHOD', 'IMPORTING', 'EXPORTING',
+    'CHANGING', 'RETURNING', 'RAISING', 'CALL', 'FUNCTION', 'PERFORM', 'FORM', 'ENDFORM',
+    'TRY', 'CATCH', 'CLEANUP', 'ENDTRY', 'RAISE', 'EXCEPTION', 'RESUME',
+    'MESSAGE', 'DISPLAY', 'SET', 'PARAMETER', 'GET', 'EXPORT', 'IMPORT', 'DATABASE',
+    'MOVE', 'COMPUTE', 'ADD', 'SUBTRACT', 'MULTIPLY', 'DIVIDE', 'CONCATENATE', 'SEPARATED',
+    'SPLIT', 'CONDENSE', 'NO-GAPS', 'TRANSLATE', 'UPPER', 'LOWER', 'REPLACE',
+    'PROVIDE', 'ENDPROVIDE', 'DESCRIBE', 'LINES', 'ASSIGN', 'COMPONENT', 'STRUCTURE',
+    'UNASSIGN', 'IS', 'INITIAL', 'NOT', 'ASSIGNED', 'BOUND', 'BETWEEN', 'AND', 'OR', 'EQ', 'NE', 'LT', 'LE', 'GT', 'GE'
+  ]);
+
+  function highlightABAP(code) {
+    if (!code) return '';
+    const lines = code.split('\n');
+    const tokenRegex = /(\"[^\r\n]*)|('([^']|'')*')|(\|([^\\|]|\\[\s\S])*\|)|(@(?:DATA|data)\b|@[A-Za-z0-9_]+(?:-[A-Za-z0-9_]+)?|<[A-Za-z0-9_]+>)|(\bsy-[A-Za-z0-9_]+\b)|(\b\d+(?:\.\d+)?\b)|([A-Za-z0-9_#-]+)/g;
+
+    return lines.map(line => {
+      if (/^\s*\*/.test(line)) {
+        return '<span class="hl-com">' + escapeHtml(line) + '</span>';
+      }
+
+      return line.replace(tokenRegex, (match, com, str1, strInner, tmpl, hostOrFs, sysVar, num, word) => {
+        if (com) {
+          return '<span class="hl-com">' + escapeHtml(com) + '</span>';
+        }
+        if (str1 || tmpl) {
+          return '<span class="hl-str">' + escapeHtml(match) + '</span>';
+        }
+        if (hostOrFs) {
+          return '<span class="hl-sys">' + escapeHtml(hostOrFs) + '</span>';
+        }
+        if (sysVar) {
+          return '<span class="hl-sys">' + escapeHtml(sysVar) + '</span>';
+        }
+        if (num) {
+          return '<span class="hl-num">' + escapeHtml(num) + '</span>';
+        }
+        if (word) {
+          const upper = word.toUpperCase();
+          if (keywordsSet.has(upper)) {
+            return '<span class="hl-kw">' + escapeHtml(word) + '</span>';
+          }
+          return escapeHtml(word);
+        }
+        return escapeHtml(match);
+      });
+    }).join('\n');
   }
 
   /**

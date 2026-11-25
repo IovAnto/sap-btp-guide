@@ -18,7 +18,7 @@
             --accent-green: #10b981;
             --accent-red: #ef4444;
             --code-bg: #131620;
-            --sidebar-width: 270px;
+            --sidebar-width: 290px;
             --font-sans: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
             --font-mono: ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, "Liberation Mono", monospace;
         }
@@ -75,6 +75,23 @@
         .sidebar-header {
             padding: 20px 20px 16px 20px;
             border-bottom: 1px solid var(--border-color);
+        }
+
+        .nav-hub-link {
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            font-size: 0.72rem;
+            color: var(--accent);
+            text-decoration: none;
+            font-weight: 600;
+            margin-bottom: 8px;
+            font-family: var(--font-mono);
+            transition: opacity 0.15s;
+        }
+
+        .nav-hub-link:hover {
+            text-decoration: underline;
         }
 
         .sidebar-header h1 {
@@ -413,7 +430,7 @@
             border-radius: 6px;
             padding: 16px;
             overflow-x: auto;
-            color: var(--accent);
+            color: var(--text-title);
             margin: 16px 0 36px 0;
         }
 
@@ -689,7 +706,7 @@
         <!-- Minimal Left Sidebar -->
         <aside class="sidebar" id="sidebar">
             <div class="sidebar-header">
-                <a href="../index.html" style="display: inline-flex; align-items: center; gap: 4px; font-size: 0.72rem; color: var(--accent); text-decoration: none; font-weight: 600; margin-bottom: 8px; font-family: var(--font-mono);">← Hub Manuali</a>
+                <a href="../index.html" class="nav-hub-link">← Hub Manuali</a>
                 <h1>SAP BTP Master Guide</h1>
                 <p>Manuale di Riferimento & Certificazione</p>
             </div>
@@ -736,6 +753,10 @@
         } catch(e) {}
 
         function init() {
+            const savedTheme = localStorage.getItem('abap-wiki-theme') || 'dark';
+            document.documentElement.setAttribute('data-theme', savedTheme);
+            const btn = document.querySelector('.theme-toggle-btn');
+            if (btn) btn.textContent = savedTheme === 'dark' ? 'Tema: Dark' : 'Tema: Light';
             renderNav();
             loadChapter(activeId);
             updateStats();
@@ -1022,6 +1043,9 @@
             const cur = document.documentElement.getAttribute('data-theme') || 'dark';
             const nxt = cur === 'dark' ? 'light' : 'dark';
             document.documentElement.setAttribute('data-theme', nxt);
+            localStorage.setItem('abap-wiki-theme', nxt);
+            const btn = document.querySelector('.theme-toggle-btn');
+            if (btn) btn.textContent = nxt === 'dark' ? 'Tema: Dark' : 'Tema: Light';
         }
 
         function escapeHtml(str) {
