@@ -1,11 +1,12 @@
-# SAP BTP Master Guide & Enterprise Certification Hub
+# SAP Enterprise Engineering & Certification Hub
 
-> **Guida interattiva e pragmatica per lo studio, il lavoro e la certificazione su SAP Business Technology Platform (SAP BTP).**  
-> Basata sul testo ufficiale Rheinwerk / SAP PRESS *"SAP Business Technology Platform (SAP BTP): An Introduction"*.
+> **Piattaforma unificata per lo studio, il lavoro e la certificazione professionale sull'ecosistema SAP BTP e sul linguaggio ABAP.**
 
 🌐 **Accedi alle applicazioni live su GitHub Pages**:  
-* 👉 **[SAP BTP Master Guide](https://iovanto.github.io/sap-btp-guide/)**
-* 👉 **[ABAP Data Dictionary (DDIC) Tree Wiki](https://iovanto.github.io/sap-btp-guide/abap-wiki/)** (Reference minimale per Tabelle, Colonne, Data Element, Domini e Snippet)
+* 🌐 **[Portale Hub Principale](https://iovanto.github.io/sap-btp-guide/)** (Punto di accesso rapido ai 3 manuali con sincronizzazione tema Dark/Light)
+* 📘 **[1. SAP BTP Master Guide](https://iovanto.github.io/sap-btp-guide/btp-guide/)** (Architettura, 18 Capitoli, 180 Quiz di Certificazione, 63 schemi SAP PRESS)
+* 📙 **[2. ABAP Data Dictionary (DDIC)](https://iovanto.github.io/sap-btp-guide/abap-wiki/)** (16 Tabelle Core, 157 Colonne unrolled, Chiavi Esterne, Where-Used Inspector)
+* 📗 **[3. ABAP Sintassi & Semantica](https://iovanto.github.io/sap-btp-guide/abap-syntax/)** (100% dei costrutti ABAP Moderni, Classici e Deprecati ma Supportati, con guida alla modernizzazione)
 
 ---
 

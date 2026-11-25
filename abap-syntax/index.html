@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="it" data-theme="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ABAP Sintassi & Semantica — Manuale Tecnico del Linguaggio</title>
+  <link rel="stylesheet" href="css/style.css">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220%200%20100%20100%22><rect width=%22100%22 height=%22100%22 rx=%2220%22 fill=%22%23212529%22/><text y=%2265%22 x=%2210%22 font-size=%2244%22 fill=%22white%22 font-family=%22monospace%22>CODE</text></svg>">
+</head>
+<body>
+
+  <div class="layout">
+    
+    <!-- Sidebar: Table of Contents (TOC) -->
+    <aside class="sidebar">
+      <div class="sidebar-header">
+        <a href="../index.html" class="nav-hub-link">← Hub Manuali</a>
+        <h1>ABAP Sintassi & Semantica</h1>
+        <p>Manuale Tecnico Completo del Linguaggio</p>
+      </div>
+
+      <div class="sidebar-search">
+        <input type="text" id="search-input" placeholder="Cerca costrutto (es. header line, break, loop)..." autocomplete="off" spellcheck="false">
+        <span class="search-shortcut-hint">/</span>
+      </div>
+
+      <nav class="sidebar-nav" id="toc-nav">
+        <!-- Rendered dynamically via JavaScript -->
+      </nav>
+
+      <div class="sidebar-footer">
+        <span id="footer-count">13 Categorie</span>
+        <button class="btn-toggle-theme" id="theme-btn">Tema: Dark</button>
+      </div>
+    </aside>
+
+    <!-- Reading Scroll Area: Unrolled Continuous Manual -->
+    <main class="reading-scroll" id="reading-scroll">
+      <article class="manual-container" id="manual-container">
+        <!-- Rendered dynamically via JavaScript -->
+      </article>
+    </main>
+
+  </div>
+
+  <!-- Inspector Modal (Quick Reference & Detail View) -->
+  <div class="inspector-overlay hidden" id="inspector-modal" role="dialog" aria-modal="true" aria-labelledby="modal-title">
+    <div class="inspector-card">
+      <div class="inspector-header">
+        <div class="inspector-badge" id="modal-badge">[SINTASSI]</div>
+        <h2 class="inspector-title" id="modal-title">NOME_COSTRUTTO</h2>
+        <button class="btn-modal-close" id="modal-close-btn" title="Chiudi (Esc)">✕</button>
+      </div>
+      <div class="inspector-body" id="modal-body">
+        <!-- Injected via JavaScript -->
+      </div>
+    </div>
+  </div>
+
+  <!-- Offline-safe dataset + controller script -->
+  <script src="data/syntax.js"></script>
+  <script src="js/app.js"></script>
+</body>
+</html>
