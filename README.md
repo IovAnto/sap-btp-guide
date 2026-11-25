@@ -2,19 +2,19 @@
 
 > **Piattaforma unificata per lo studio, il lavoro e la certificazione professionale sull'ecosistema SAP BTP e sul linguaggio ABAP.**
 
-🌐 **Accedi alle applicazioni live su GitHub Pages**:  
-* 🌐 **[Portale Hub Principale](https://iovanto.github.io/sap-btp-guide/)** (Punto di accesso rapido ai 3 manuali con sincronizzazione tema Dark/Light)
-* 📘 **[1. SAP BTP Master Guide](https://iovanto.github.io/sap-btp-guide/btp-guide/)** (Architettura, 18 Capitoli, 180 Quiz di Certificazione, 63 schemi SAP PRESS)
-* 📙 **[2. ABAP Data Dictionary (DDIC)](https://iovanto.github.io/sap-btp-guide/abap-wiki/)** (16 Tabelle Core, 157 Colonne unrolled, Chiavi Esterne, Where-Used Inspector)
-* 📗 **[3. ABAP Sintassi & Semantica](https://iovanto.github.io/sap-btp-guide/abap-syntax/)** (100% dei costrutti ABAP Moderni, Classici e Deprecati ma Supportati, con guida alla modernizzazione)
+**Accedi alle applicazioni live su GitHub Pages**:  
+* **[Portale Hub Principale](https://iovanto.github.io/sap-btp-guide/)** (Punto di accesso rapido ai 3 manuali con sincronizzazione tema Dark/Light)
+* **[1. SAP BTP Master Guide](https://iovanto.github.io/sap-btp-guide/btp-guide/)** (Architettura, 18 Capitoli, 180 Quiz di Certificazione, 63 schemi SAP PRESS)
+* **[2. ABAP Data Dictionary (DDIC)](https://iovanto.github.io/sap-btp-guide/abap-wiki/)** (16 Tabelle Core, 157 Colonne unrolled, Chiavi Esterne, Where-Used Inspector)
+* **[3. ABAP Sintassi & Semantica](https://iovanto.github.io/sap-btp-guide/abap-syntax/)** (100% dei costrutti ABAP Moderni, Classici e Deprecati ma Supportati, con guida alla modernizzazione)
 
 ---
 
-## 📌 Panoramica del Progetto
+## Panoramica del Progetto
 
 Questa applicazione è una Single Page Application autonoma ad alte prestazioni, fruibile da qualsiasi dispositivo (desktop, tablet, smartphone) sia online che offline.
 
-### 📊 Numeri Chiave
+### Numeri Chiave
 - **18 Capitoli Integrali**: Copertura completa di Fondamenti, Architettura, Componenti BTP e tutti i Casi d'Uso Reali di settore.
 - **180 Domande di Quiz & Certificazione**: 10 domande per capitolo con feedback immediato e spiegazione architetturale approfondita.
 - **63 Figure e Diagrammi Ufficiali**: Schemi architetturali estratti dal testo SAP Press ad alta risoluzione con Lightbox interattivo.
@@ -25,7 +25,7 @@ Questa applicazione è una Single Page Application autonoma ad alte prestazioni,
 
 ---
 
-## 📚 Struttura dei Contenuti
+## Struttura dei Contenuti
 
 ### Parte I: Overview & Architettura
 1. **Capitolo 01**: Introduzione, Digital Transformation, Intelligent Enterprise, O-Data vs X-Data, Clean Core e i 4 Pilastri Tecnologici.
@@ -53,7 +53,7 @@ Questa applicazione è una Single Page Application autonoma ad alte prestazioni,
 
 ---
 
-## 💻 Utilizzo Locale
+## Utilizzo Locale
 
 Per consultare l'applicazione in locale senza connessione web:
 ```bash
@@ -69,5 +69,5 @@ start index.html      # Windows
 
 ---
 
-## 📄 Licenza & Note
+## Licenza & Note
 Guida realizzata a scopo formativo e professionale. Contenuti e riferimenti basati sulla documentazione ufficiale e sulle pubblicazioni Rheinwerk / SAP PRESS.

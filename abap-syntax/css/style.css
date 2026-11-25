@@ -231,16 +231,18 @@ body {
   font-family: var(--font-mono);
   text-transform: uppercase;
   flex-shrink: 0;
+  color: var(--text-muted);
+  border: 1px solid var(--border-color);
 }
 
 .toc-mini-badge.dep {
-  color: var(--accent-orange);
-  border: 1px solid var(--accent-orange);
+  color: var(--text-title);
+  border: 1px solid var(--border-color);
 }
 
 .toc-mini-badge.mod {
-  color: var(--accent-green);
-  border: 1px solid var(--accent-green);
+  color: var(--text-title);
+  border: 1px solid var(--border-color);
 }
 
 .toc-mini-badge.cls {
@@ -441,15 +443,15 @@ body {
 }
 
 .badge-status.deprecated {
-  color: var(--accent-orange);
-  border: 1px solid var(--accent-orange);
-  background: var(--accent-orange-soft);
+  color: var(--text-title);
+  border: 1px solid var(--border-color);
+  background: var(--bg-surface-hover);
 }
 
 .badge-status.modern {
-  color: var(--accent-green);
-  border: 1px solid var(--accent-green);
-  background: rgba(16, 185, 129, 0.08);
+  color: var(--text-title);
+  border: 1px solid var(--border-color);
+  background: var(--bg-surface);
 }
 
 .badge-status.classic {
@@ -462,7 +464,7 @@ body {
 .syntax-sig-box {
   background: var(--code-bg);
   border: 1px solid var(--border-color);
-  border-left: 3px solid var(--accent);
+  border-left: 3px solid var(--text-title);
   border-radius: 4px;
   padding: 10px 14px;
   font-family: var(--font-mono);
@@ -475,8 +477,9 @@ body {
 
 /* Callout Boxes */
 .deprec-box {
-  background: var(--accent-orange-soft);
-  border-left: 3px solid var(--accent-orange);
+  background: var(--bg-surface);
+  border: 1px solid var(--border-color);
+  border-left: 3px solid var(--text-muted);
   border-radius: 0 4px 4px 0;
   padding: 12px 16px;
   margin: 14px 0;
@@ -485,13 +488,14 @@ body {
 }
 
 .deprec-box strong {
-  color: var(--accent-orange);
+  color: var(--text-title);
+  font-family: var(--font-mono);
 }
 
 .gotcha-box {
   background: var(--bg-surface);
   border: 1px solid var(--border-color);
-  border-left: 3px solid var(--accent-red);
+  border-left: 3px solid var(--text-title);
   border-radius: 0 4px 4px 0;
   padding: 12px 16px;
   margin: 14px 0;
@@ -500,12 +504,14 @@ body {
 }
 
 .gotcha-box strong {
-  color: var(--accent-red);
+  color: var(--text-title);
+  font-family: var(--font-mono);
 }
 
 .modern-box {
   background: var(--bg-surface);
-  border-left: 3px solid var(--accent-green);
+  border: 1px solid var(--border-color);
+  border-left: 3px solid var(--text-muted);
   border-radius: 0 4px 4px 0;
   padding: 10px 16px;
   margin: 10px 0;
@@ -513,7 +519,8 @@ body {
 }
 
 .modern-box strong {
-  color: var(--accent-green);
+  color: var(--text-title);
+  font-family: var(--font-mono);
 }
 
 /* System Fields Strip */

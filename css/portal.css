@@ -192,18 +192,16 @@ body {
   letter-spacing: 0.06em;
   margin-bottom: 12px;
   display: inline-block;
+  color: var(--text-muted);
+  border: 1px solid var(--border-color);
+  padding: 1px 6px;
+  border-radius: 3px;
 }
 
-.card-category-badge.btp {
-  color: var(--accent);
-}
-
-.card-category-badge.ddic {
-  color: var(--accent-orange);
-}
-
+.card-category-badge.btp,
+.card-category-badge.ddic,
 .card-category-badge.syntax {
-  color: var(--accent-green);
+  color: var(--text-title);
 }
 
 .card-title {

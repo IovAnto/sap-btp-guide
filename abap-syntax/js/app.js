@@ -295,14 +295,14 @@
           <!-- Deprecation Alert Box & Clean ABAP Alternative -->
           ${c.whyDeprecated ? `
             <div class="deprec-box">
-              <strong>⚠️ Perché è Deprecato:</strong><br>
+              <strong>[DEPRECATO]:</strong><br>
               ${escapeHtml(c.whyDeprecated)}
             </div>
           ` : ''}
 
           ${c.modernEquivalent ? `
             <div class="modern-box">
-              <strong>💡 Alternativa Moderna (Clean ABAP):</strong><br>
+              <strong>[MODERN CLEAN ABAP]:</strong><br>
               ${escapeHtml(c.modernEquivalent)}
             </div>
           ` : ''}
@@ -310,7 +310,7 @@
           <!-- Gotchas & Pitfalls Alert Box -->
           ${c.gotchas ? `
             <div class="gotcha-box">
-              <strong>⚡ Insidie & Casi Limite (Runtime Gotchas):</strong><br>
+              <strong>[INSIDIE & GOTCHAS]:</strong><br>
               ${escapeHtml(c.gotchas)}
             </div>
           ` : ''}
@@ -359,21 +359,21 @@
 
       ${construct.whyDeprecated ? `
         <div class="deprec-box">
-          <strong>Perché è Deprecato:</strong><br>
+          <strong>[DEPRECATO]:</strong><br>
           ${escapeHtml(construct.whyDeprecated)}
         </div>
       ` : ''}
 
       ${construct.modernEquivalent ? `
         <div class="modern-box">
-          <strong>Equivalente Moderno:</strong><br>
+          <strong>[MODERN CLEAN ABAP]:</strong><br>
           ${escapeHtml(construct.modernEquivalent)}
         </div>
       ` : ''}
 
       ${construct.gotchas ? `
         <div class="gotcha-box">
-          <strong>Insidie:</strong><br>
+          <strong>[INSIDIE & GOTCHAS]:</strong><br>
           ${escapeHtml(construct.gotchas)}
         </div>
       ` : ''}
