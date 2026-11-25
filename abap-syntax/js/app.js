@@ -11,6 +11,8 @@
     dataset: window.ABAP_SYNTAX || null,
     activeCategory: 'DATA_DEF',
     searchQuery: '',
+    statusFilter: 'all', // 'all' | 'modern' | 'classic' | 'deprecated'
+    viewMode: 'full',    // 'full' | 'compact'
     expandedCategories: new Set([
       'DATA_DEF', 'ASSIGN_STRING', 'SQL_ACCESS', 'ITAB_OPS',
       'CONSTRUCTORS', 'POINTERS', 'CONTROL_FLOW', 'DEBUG_TRACE',
@@ -187,8 +189,18 @@
    */
   function scrollToConstruct(catId, constructId) {
     closeInspector();
+    let reRenderNeeded = false;
     if (state.activeCategory !== catId) {
       state.activeCategory = catId;
+      reRenderNeeded = true;
+    }
+    const targetConstruct = state.dataset.constructs.find(c => c.id === constructId);
+    if (targetConstruct && state.statusFilter !== 'all' && targetConstruct.status !== state.statusFilter) {
+      state.statusFilter = 'all';
+      reRenderNeeded = true;
+    }
+
+    if (reRenderNeeded) {
       renderCategoryChapter(catId);
     }
     renderTOC();
@@ -200,7 +212,7 @@
         target.classList.add('highlighted');
         setTimeout(() => target.classList.remove('highlighted'), 2000);
       }
-    }, 50);
+    }, 60);
   }
 
   /**
@@ -211,7 +223,20 @@
     const cat = state.dataset.categories.find(c => c.id === catId);
     if (!cat) return;
 
-    const constructs = state.dataset.constructs.filter(c => c.category === catId);
+    const allConstructs = state.dataset.constructs.filter(c => c.category === catId);
+
+    // Compute filter counts
+    const counts = {
+      all: allConstructs.length,
+      modern: allConstructs.filter(c => c.status === 'modern').length,
+      classic: allConstructs.filter(c => c.status === 'classic').length,
+      deprecated: allConstructs.filter(c => c.status === 'deprecated').length
+    };
+
+    // Filter constructs
+    const constructs = state.statusFilter === 'all'
+      ? allConstructs
+      : allConstructs.filter(c => c.status === state.statusFilter);
 
     let html = `
       <!-- Category Header -->
@@ -221,9 +246,37 @@
         <p class="category-desc">${escapeHtml(cat.description)}</p>
       </div>
 
+      <!-- Chapter Toolbar: Status Filters & View Mode -->
+      <div class="chapter-toolbar">
+        <div class="filter-pills-group">
+          <span class="toolbar-label">Filtra per stato:</span>
+          <button class="filter-pill ${state.statusFilter === 'all' ? 'active' : ''}" onclick="window.ABAP_SYNTAX_APP.setStatusFilter('all')">Tutti (${counts.all})</button>
+          ${counts.modern > 0 ? `<button class="filter-pill ${state.statusFilter === 'modern' ? 'active' : ''}" onclick="window.ABAP_SYNTAX_APP.setStatusFilter('modern')">Moderni (${counts.modern})</button>` : ''}
+          ${counts.classic > 0 ? `<button class="filter-pill ${state.statusFilter === 'classic' ? 'active' : ''}" onclick="window.ABAP_SYNTAX_APP.setStatusFilter('classic')">Classici (${counts.classic})</button>` : ''}
+          ${counts.deprecated > 0 ? `<button class="filter-pill ${state.statusFilter === 'deprecated' ? 'active' : ''}" onclick="window.ABAP_SYNTAX_APP.setStatusFilter('deprecated')">Deprecati (${counts.deprecated})</button>` : ''}
+        </div>
+
+        <div class="view-mode-group">
+          <button class="view-mode-btn ${state.viewMode === 'full' ? 'active' : ''}" data-mode="full" onclick="window.ABAP_SYNTAX_APP.setViewMode('full')">Vista Completa</button>
+          <button class="view-mode-btn ${state.viewMode === 'compact' ? 'active' : ''}" data-mode="compact" onclick="window.ABAP_SYNTAX_APP.setViewMode('compact')">Vista Rapida</button>
+        </div>
+      </div>
+
+      <!-- Quick Jump Horizontal Strip -->
+      <div class="quick-jump-strip">
+        <span class="jump-label">Salto Rapido:</span>
+        <div class="jump-pills-scroll">
+          ${allConstructs.map((c, idx) => `
+            <button class="jump-pill" onclick="window.ABAP_SYNTAX_APP.scrollToConstruct('${escapeHtml(cat.id)}', '${escapeHtml(c.id)}')">
+              #${idx + 1} ${escapeHtml(c.name.split(' (')[0])}
+            </button>
+          `).join('')}
+        </div>
+      </div>
+
       <!-- Section 1: Panoramica Sintetica della Categoria -->
-      <h2 class="manual-h2">1. Panoramica Sintetica (${constructs.length} Costrutti)</h2>
-      <p class="manual-p">Tabella di consultazione rapida. Clicca sul nome di un costrutto per scorrere direttamente alla sua trattazione dettagliata:</p>
+      <h2 class="manual-h2">1. Panoramica Sintetica (${constructs.length} di ${allConstructs.length} Costrutti)</h2>
+      <p class="manual-p">Tabella di consultazione rapida. Clicca su qualsiasi riga per scorrere direttamente alla scheda tecnica:</p>
       
       <div class="syntax-summary-box">
         <table class="syntax-summary-table">
@@ -231,7 +284,7 @@
             <tr>
               <th style="width: 220px;">Costrutto</th>
               <th style="width: 140px;">Stato</th>
-              <th>Definizione & Ruolo Operativo</th>
+              <th>Definizione & Scopo Rapido</th>
             </tr>
           </thead>
           <tbody>
@@ -241,9 +294,9 @@
               if (c.status === 'modern') badgeCls = 'modern';
 
               return `
-                <tr>
+                <tr style="cursor: pointer;" onclick="window.ABAP_SYNTAX_APP.scrollToConstruct('${escapeHtml(cat.id)}', '${escapeHtml(c.id)}')">
                   <td>
-                    <span class="link-construct" onclick="window.ABAP_SYNTAX_APP.scrollToConstruct('${escapeHtml(cat.id)}', '${escapeHtml(c.id)}')">
+                    <span class="link-construct">
                       ${escapeHtml(c.name)}
                     </span>
                   </td>
@@ -251,7 +304,7 @@
                     <span class="badge-status ${badgeCls}">${escapeHtml(c.statusBadge)}</span>
                   </td>
                   <td style="color: var(--text-main); font-size: 0.85rem;">
-                    ${escapeHtml(c.shortText)}
+                    ${formatRichText(c.shortText)}
                   </td>
                 </tr>
               `;
@@ -260,9 +313,9 @@
         </table>
       </div>
 
-      <!-- Section 2: Dettaglio Completo dei Costrutti (Unrolled) -->
-      <h2 class="manual-h2">2. Dettaglio Tecnico & Semantica dei Singoli Costrutti</h2>
-      <p class="manual-p">Specifiche formali, semantica di esecuzione passo-passo, trappole d'esame, casi limite ed esempi compilabili:</p>
+      <!-- Section 2: Dettaglio Completo dei Costrutti (Schede Tecniche) -->
+      <h2 class="manual-h2" style="margin-top: 36px;">2. Schede Tecniche & Semantica dei Costrutti</h2>
+      <p class="manual-p">Firme formali, semantica di esecuzione, insidie d'esame e di runtime, alternative Clean ABAP ed esempi compilabili:</p>
     `;
 
     constructs.forEach((c, idx) => {
@@ -271,72 +324,104 @@
       if (c.status === 'modern') badgeCls = 'modern';
 
       html += `
-        <div class="construct-chapter" id="construct-${escapeHtml(c.id)}">
+        <article class="construct-card" id="construct-${escapeHtml(c.id)}">
           
-          <div class="construct-head-row">
-            <div class="construct-head-title">
-              <span style="font-family: var(--font-mono); color: var(--accent); font-size: 0.9rem;">#${idx + 1}</span>
-              <span>${escapeHtml(c.name)}</span>
+          <!-- Card Header -->
+          <div class="construct-card-header">
+            <div class="construct-card-title-group">
+              <span class="construct-index-badge">#${idx + 1}</span>
+              <h3 class="construct-card-title">${escapeHtml(c.name)}</h3>
             </div>
-            <span class="badge-status ${badgeCls}">${escapeHtml(c.statusBadge)}</span>
+            <div class="construct-header-actions">
+              <span class="badge-status ${badgeCls}">${escapeHtml(c.statusBadge)}</span>
+              <button class="btn-card-action" onclick="window.ABAP_SYNTAX_APP.copySnippet(${escapeHtml(JSON.stringify(c.syntax))})">Copia Sintassi</button>
+            </div>
           </div>
 
           <!-- Syntax Signature Box -->
-          <div class="syntax-sig-box">${highlightABAP(c.syntax)}</div>
+          <div class="syntax-sig-container">
+            <div class="syntax-sig-label">Firma Sintattica Formale:</div>
+            <div class="syntax-sig-box">${highlightABAP(c.syntax)}</div>
+          </div>
 
-          <!-- Description & Semantic -->
-          <p class="manual-p" style="font-size: 0.98rem; font-weight: 600; color: var(--text-title); margin-bottom: 6px;">
-            ${escapeHtml(c.shortText)}
-          </p>
-          <p class="manual-p">
-            ${escapeHtml(c.semantic)}
-          </p>
+          <!-- Quick Purpose Bar -->
+          <div class="construct-purpose-bar">
+            <span class="purpose-tag">Scopo Rapido:</span>
+            <span class="purpose-text">${formatRichText(c.shortText)}</span>
+          </div>
 
-          <!-- Deprecation Alert Box & Clean ABAP Alternative -->
-          ${c.whyDeprecated ? `
-            <div class="deprec-box">
-              <strong>[DEPRECATO]:</strong><br>
-              ${escapeHtml(c.whyDeprecated)}
-            </div>
-          ` : ''}
+          <!-- Expand button for compact mode -->
+          <button class="btn-expand-details" onclick="window.ABAP_SYNTAX_APP.toggleCardDetails('${escapeHtml(c.id)}')">
+            Espandi Dettagli (Semantica & Gotchas)
+          </button>
 
-          ${c.modernEquivalent ? `
-            <div class="modern-box">
-              <strong>[MODERN CLEAN ABAP]:</strong><br>
-              ${escapeHtml(c.modernEquivalent)}
-            </div>
-          ` : ''}
+          <!-- Execution Semantic Block -->
+          <div class="construct-semantic-block">
+            <div class="semantic-label">Semantica & Regole di Esecuzione:</div>
+            <div class="semantic-content">${formatRichText(c.semantic)}</div>
+          </div>
 
-          <!-- Gotchas & Pitfalls Alert Box -->
-          ${c.gotchas ? `
-            <div class="gotcha-box">
-              <strong>[INSIDIE & GOTCHAS]:</strong><br>
-              ${escapeHtml(c.gotchas)}
-            </div>
-          ` : ''}
+          <!-- Callout Stack (Deprecato, Modern Clean ABAP, Gotchas) -->
+          <div class="callouts-stack">
+            ${c.whyDeprecated ? `
+              <div class="callout-card callout-deprec">
+                <div class="callout-title">
+                  <span class="callout-tag">[DEPRECATO]</span> Motivo della Deprecazione:
+                </div>
+                <div class="callout-text">${formatRichText(c.whyDeprecated)}</div>
+              </div>
+            ` : ''}
 
-          <!-- System Fields -->
+            ${c.modernEquivalent ? `
+              <div class="callout-card callout-modern">
+                <div class="callout-title">
+                  <span class="callout-tag">[MODERN CLEAN ABAP]</span> Alternativa Raccomandata:
+                </div>
+                <div class="callout-text">${formatRichText(c.modernEquivalent)}</div>
+              </div>
+            ` : ''}
+
+            ${c.gotchas ? `
+              <div class="callout-card callout-gotcha">
+                <div class="callout-title">
+                  <span class="callout-tag">[INSIDIE & GOTCHAS]</span> Trabocchetti & Casi Limite:
+                </div>
+                <div class="callout-text">${formatRichText(c.gotchas)}</div>
+              </div>
+            ` : ''}
+          </div>
+
+          <!-- System Fields Influenced -->
           ${c.systemFields && c.systemFields.length > 0 && c.systemFields[0] !== 'Nessuno' ? `
-            <div class="sysfields-strip">
-              <span>Campi di sistema influenzati:</span>
-              ${c.systemFields.map(sf => `<code>${escapeHtml(sf)}</code>`).join(' ')}
+            <div class="sysfields-row">
+              <span class="sysfields-label">Campi di Sistema Influenzati:</span>
+              <div class="sysfields-tags">
+                ${c.systemFields.map(sf => `<code class="sys-chip">${escapeHtml(sf)}</code>`).join(' ')}
+              </div>
             </div>
           ` : ''}
 
-          <!-- Code Example Box -->
+          <!-- Practical Compilable Example Code -->
           ${c.exampleCode ? `
-            <div class="code-header-bar">
-              <span>Esempio Pratico Compilabile</span>
-              <button class="btn-copy-code" onclick="window.ABAP_SYNTAX_APP.copySnippet(${escapeHtml(JSON.stringify(c.exampleCode))})">Copia Codice</button>
+            <div style="margin-top: 16px;">
+              <div class="code-header-bar">
+                <span>Esempio Pratico Compilabile</span>
+                <button class="btn-copy-code" onclick="window.ABAP_SYNTAX_APP.copySnippet(${escapeHtml(JSON.stringify(c.exampleCode))})">Copia Codice</button>
+              </div>
+              <pre class="manual-code-box"><code>${highlightABAP(c.exampleCode)}</code></pre>
             </div>
-            <pre class="manual-code-box"><code>${highlightABAP(c.exampleCode)}</code></pre>
           ` : ''}
 
-        </div>
+        </article>
       `;
     });
 
     el.manualContainer.innerHTML = html;
+    if (state.viewMode === 'compact') {
+      el.manualContainer.classList.add('view-compact');
+    } else {
+      el.manualContainer.classList.remove('view-compact');
+    }
   }
 
   /**
@@ -351,39 +436,58 @@
     el.modalBadge.textContent = construct.statusBadge;
 
     let html = `
-      <div style="margin-bottom: 14px;">
-        <h3 style="font-size: 1rem; font-weight: 700; color: var(--text-title); margin-bottom: 4px;">Firma Sintattica</h3>
-        <div class="syntax-sig-box" style="margin: 4px 0 12px 0;">${highlightABAP(construct.syntax)}</div>
-        <p class="manual-p">${escapeHtml(construct.semantic)}</p>
+      <div class="syntax-sig-container">
+        <div class="syntax-sig-label">Firma Sintattica:</div>
+        <div class="syntax-sig-box">${highlightABAP(construct.syntax)}</div>
       </div>
 
-      ${construct.whyDeprecated ? `
-        <div class="deprec-box">
-          <strong>[DEPRECATO]:</strong><br>
-          ${escapeHtml(construct.whyDeprecated)}
-        </div>
-      ` : ''}
+      <div class="construct-purpose-bar" style="margin: 12px 0;">
+        <span class="purpose-tag">Scopo:</span>
+        <span class="purpose-text">${formatRichText(construct.shortText)}</span>
+      </div>
 
-      ${construct.modernEquivalent ? `
-        <div class="modern-box">
-          <strong>[MODERN CLEAN ABAP]:</strong><br>
-          ${escapeHtml(construct.modernEquivalent)}
-        </div>
-      ` : ''}
+      <div class="construct-semantic-block">
+        <div class="semantic-label">Semantica & Regole di Esecuzione:</div>
+        <div class="semantic-content">${formatRichText(construct.semantic)}</div>
+      </div>
 
-      ${construct.gotchas ? `
-        <div class="gotcha-box">
-          <strong>[INSIDIE & GOTCHAS]:</strong><br>
-          ${escapeHtml(construct.gotchas)}
-        </div>
-      ` : ''}
+      <div class="callouts-stack">
+        ${construct.whyDeprecated ? `
+          <div class="callout-card callout-deprec">
+            <div class="callout-title">
+              <span class="callout-tag">[DEPRECATO]</span> Motivo Deprecazione:
+            </div>
+            <div class="callout-text">${formatRichText(construct.whyDeprecated)}</div>
+          </div>
+        ` : ''}
+
+        ${construct.modernEquivalent ? `
+          <div class="callout-card callout-modern">
+            <div class="callout-title">
+              <span class="callout-tag">[MODERN CLEAN ABAP]</span> Alternativa Raccomandata:
+            </div>
+            <div class="callout-text">${formatRichText(construct.modernEquivalent)}</div>
+          </div>
+        ` : ''}
+
+        ${construct.gotchas ? `
+          <div class="callout-card callout-gotcha">
+            <div class="callout-title">
+              <span class="callout-tag">[INSIDIE & GOTCHAS]</span> Trabocchetti:
+            </div>
+            <div class="callout-text">${formatRichText(construct.gotchas)}</div>
+          </div>
+        ` : ''}
+      </div>
 
       ${construct.exampleCode ? `
-        <div class="code-header-bar" style="margin-top: 14px;">
-          <span>Esempio di Codice</span>
-          <button class="btn-copy-code" onclick="window.ABAP_SYNTAX_APP.copySnippet(${escapeHtml(JSON.stringify(construct.exampleCode))})">Copia</button>
+        <div style="margin-top: 14px;">
+          <div class="code-header-bar">
+            <span>Esempio di Codice</span>
+            <button class="btn-copy-code" onclick="window.ABAP_SYNTAX_APP.copySnippet(${escapeHtml(JSON.stringify(construct.exampleCode))})">Copia Codice</button>
+          </div>
+          <pre class="manual-code-box"><code>${highlightABAP(construct.exampleCode)}</code></pre>
         </div>
-        <pre class="manual-code-box"><code>${highlightABAP(construct.exampleCode)}</code></pre>
       ` : ''}
     `;
 
@@ -471,14 +575,14 @@
   function highlightABAP(code) {
     if (!code) return '';
     const lines = code.split('\n');
-    const tokenRegex = /(\"[^\r\n]*)|('([^']|'')*')|(\|([^\\|]|\\[\s\S])*\|)|(@(?:DATA|data)\b|@[A-Za-z0-9_]+(?:-[A-Za-z0-9_]+)?|<[A-Za-z0-9_]+>)|(\bsy-[A-Za-z0-9_]+\b)|(\b\d+(?:\.\d+)?\b)|([A-Za-z0-9_#-]+)/g;
+    const tokenRegex = /(\"[^\r\n]*)|('(?:[^']|'')*')|(\|(?:[^\\|]|\\[\s\S])*\|)|(@(?:DATA|data)\b|@[A-Za-z0-9_]+(?:-[A-Za-z0-9_]+)?|<[A-Za-z0-9_]+>)|(\bsy-[A-Za-z0-9_]+\b)|(\b\d+(?:\.\d+)?\b)|([A-Za-z0-9_#-]+)/g;
 
     return lines.map(line => {
       if (/^\s*\*/.test(line)) {
         return '<span class="hl-com">' + escapeHtml(line) + '</span>';
       }
 
-      return line.replace(tokenRegex, (match, com, str1, strInner, tmpl, hostOrFs, sysVar, num, word) => {
+      return line.replace(tokenRegex, (match, com, str1, tmpl, hostOrFs, sysVar, num, word) => {
         if (com) {
           return '<span class="hl-com">' + escapeHtml(com) + '</span>';
         }
@@ -504,6 +608,54 @@
         return escapeHtml(match);
       });
     }).join('\n');
+  }
+
+  function formatRichText(text) {
+    if (!text) return '';
+    const parts = text.split(/`([^`\n]+)`/g);
+    let res = '';
+    for (let i = 0; i < parts.length; i++) {
+      if (i % 2 === 1) {
+        res += '<code class="syntax-inline-code">' + highlightABAP(parts[i]) + '</code>';
+      } else {
+        res += escapeHtml(parts[i]);
+      }
+    }
+    return res.replace(/\n\n/g, '</p><p class="rich-p">').replace(/\n/g, '<br>');
+  }
+
+  function setStatusFilter(filter) {
+    state.statusFilter = filter;
+    renderCategoryChapter(state.activeCategory);
+  }
+
+  function setViewMode(mode) {
+    state.viewMode = mode;
+    const container = document.getElementById('manual-container');
+    if (container) {
+      if (mode === 'compact') {
+        container.classList.add('view-compact');
+      } else {
+        container.classList.remove('view-compact');
+      }
+    }
+    document.querySelectorAll('.view-mode-btn').forEach(btn => {
+      btn.classList.toggle('active', btn.getAttribute('data-mode') === mode);
+    });
+  }
+
+  function toggleCardDetails(constructId) {
+    const card = document.getElementById(`construct-${constructId}`);
+    if (card) {
+      const semanticBlock = card.querySelector('.construct-semantic-block');
+      const callouts = card.querySelector('.callouts-stack');
+      const btn = card.querySelector('.btn-expand-details');
+      const isHidden = semanticBlock && window.getComputedStyle(semanticBlock).display === 'none';
+
+      if (semanticBlock) semanticBlock.style.display = isHidden ? 'block' : 'none';
+      if (callouts) callouts.style.display = isHidden ? 'flex' : 'none';
+      if (btn) btn.textContent = isHidden ? 'Riduci Dettagli' : 'Espandi Dettagli (Semantica & Gotchas)';
+    }
   }
 
   /**
@@ -548,7 +700,10 @@
     scrollToConstruct,
     inspectConstruct,
     copySnippet,
-    closeInspector
+    closeInspector,
+    setStatusFilter,
+    setViewMode,
+    toggleCardDetails
   };
 
   // Bootstrap

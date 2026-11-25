@@ -836,14 +836,14 @@ ENDIF.`;
   function highlightABAP(code) {
     if (!code) return '';
     const lines = code.split('\n');
-    const tokenRegex = /(\"[^\r\n]*)|('([^']|'')*')|(\|([^\\|]|\\[\s\S])*\|)|(@(?:DATA|data)\b|@[A-Za-z0-9_]+(?:-[A-Za-z0-9_]+)?|<[A-Za-z0-9_]+>)|(\bsy-[A-Za-z0-9_]+\b)|(\b\d+(?:\.\d+)?\b)|([A-Za-z0-9_#-]+)/g;
+    const tokenRegex = /(\"[^\r\n]*)|('(?:[^']|'')*')|(\|(?:[^\\|]|\\[\s\S])*\|)|(@(?:DATA|data)\b|@[A-Za-z0-9_]+(?:-[A-Za-z0-9_]+)?|<[A-Za-z0-9_]+>)|(\bsy-[A-Za-z0-9_]+\b)|(\b\d+(?:\.\d+)?\b)|([A-Za-z0-9_#-]+)/g;
 
     return lines.map(line => {
       if (/^\s*\*/.test(line)) {
         return '<span class="hl-com">' + escapeHtml(line) + '</span>';
       }
 
-      return line.replace(tokenRegex, (match, com, str1, strInner, tmpl, hostOrFs, sysVar, num, word) => {
+      return line.replace(tokenRegex, (match, com, str1, tmpl, hostOrFs, sysVar, num, word) => {
         if (com) {
           return '<span class="hl-com">' + escapeHtml(com) + '</span>';
         }
